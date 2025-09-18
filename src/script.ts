@@ -79,7 +79,7 @@ const createTodoElement = (todo: Todo, isDone: boolean): HTMLLIElement => {
     li.appendChild(button);
     return li;
 };
-// 8. 폼 제출 이벤트 리스너
+// 8. 폼 제출 이벤트 리스너s
 todoForm.addEventListener('submit', (event: Event) : void => {
     event.preventDefault();
     const text = getTodoText();
