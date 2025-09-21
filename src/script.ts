@@ -1,5 +1,6 @@
 //# sourceMappingURL=script.d.ts.map
 // 1. html 요소 선택
+
 const todoInput = document.getElementById('todo-input') as HTMLInputElement;
 const todoForm = document.getElementById('todo-form') as HTMLFormElement;
 const todoList = document.getElementById('todo-list') as HTMLUListElement;      
