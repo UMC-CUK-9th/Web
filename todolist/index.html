@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <!-- IE 호환성: Edge 렌더링 엔진 사용하도록 설정 -->
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <!-- 반응형 웹: 사용자의 디바이스 크기에 맞게 콘텐츠 표시 -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>todo</title>
+        <link rel="stylesheet" href="./style.css">
+        <script type = "module" src="./dist/app.js" defer></script>
+        
+    </head>
+    <body class="body">
+        <main class="main">
+            <header class="header">
+                <h1>YONG TODO</h1>
+            </header>
+            <form class="form">
+                <input id="inputTodo" type="text" placeholder="할 일 입력" class="form__input" />
+                <button id="addTodo" class="form__button--large" type="button">할 일 추가</button>
+            </form>
+            <section class="section">
+                <section class="section__todo">
+                    <h4>할 일</h4>
+                    <ul id="todoList" class="section__todo__ul"></ul>
+                </section>
+                <section class="section__finish">
+                    <h4>완료</h4>
+                    <ul id="doneList" class="section__finish__ul"></ul>
+                </section>
+            </section>
+            
+        </main>
+    </body>
+</html>
