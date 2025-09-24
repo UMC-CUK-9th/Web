@@ -4,6 +4,7 @@ import { TodoContext } from './TodoContext';
 export const TodoProvider = ({ children }:PropsWithChildren) => {
   const [todos,setTodos]=useState<string[]>([]);
   const [done,setDone]=useState<string[]>([]);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
   const handleAddDone = (id:number) => {
         setDone((prev)=>[...prev,todos[id]]);
@@ -18,7 +19,7 @@ export const TodoProvider = ({ children }:PropsWithChildren) => {
 
   return (
     <TodoContext.Provider
-      value={{ todos, done, handleAddDone, handleDeleteDone, setTodos, setDone }}
+      value={{ todos, done, handleAddDone, handleDeleteDone, setTodos, setDone, isDarkMode, setIsDarkMode }}
     >
       {children}
     </TodoContext.Provider>
