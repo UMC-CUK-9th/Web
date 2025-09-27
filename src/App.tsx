@@ -30,6 +30,7 @@ const Route = ({ path, component }: RouteProps) => {
   return null;
 };
 
+
 // Router: URL 경로를 감지
 const Router = ({ children }: { children: ReactElement[] }) => {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
