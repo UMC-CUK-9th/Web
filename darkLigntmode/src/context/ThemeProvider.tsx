@@ -33,7 +33,7 @@ export const ThemeProvider =({children}: PropsWithChildren) :JSX.Element => {
 
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const useTheme =(): IThemeContext => {
+export const useTheme =(): ITodoContext => {
   const context = useContext(ThemeContext);
 
   if (!context) {
