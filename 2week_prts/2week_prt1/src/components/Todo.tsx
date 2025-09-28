@@ -1,0 +1,34 @@
+//import { TTodo } from "../types/todo";
+import TodoForm from "./TodoForm";
+import TodoList from "./TodoList";
+import {  useTodo } from '../context/TodoContext';
+
+const Todo = () => {
+
+        const {todos, completeTodo, deleteTodo, doneTodos} = useTodo();
+
+
+
+    return <div className = 'todo-container'>
+        <h1 className = 'todo-container__header'>BEOM TODO</h1>
+        <TodoForm />
+        <div className='render-container'>
+            <TodoList 
+            title='Work' 
+            todos={todos} 
+            buttonLabel='완료'
+            buttonColor='#28a745' 
+            onClick={completeTodo}
+            />
+            <TodoList 
+            title='Complete' 
+            todos={doneTodos} 
+            buttonLabel='삭제'
+            buttonColor='#dc3545'
+            onClick={deleteTodo}
+            />
+        </div>
+    </div>
+};
+
+export default Todo;
