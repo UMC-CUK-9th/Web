@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
   "name": "3week_prt",
+=======
+  "name": "3week_prt-2",
+>>>>>>> 7e0a8be (3주차 과제 모두 진행)
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,8 +14,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<< HEAD
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
+=======
+    "@tailwindcss/vite": "^4.1.13",
+    "axios": "^1.12.2",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.9.3",
+    "tailwindcss": "^4.1.13"
+>>>>>>> 7e0a8be (3주차 과제 모두 진행)
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
