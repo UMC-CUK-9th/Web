@@ -4,37 +4,19 @@ import { fetchMovies } from "../services/FetchMovies";
 
 const TopRated = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true); 
 
   useEffect(() => {
-    const loadMovies = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const results = await fetchMovies("top_rated");
-        setMovies(results);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadMovies();
+    setIsLoading(true); 
+    fetchMovies("top_rated")
+      .then(setMovies)
+      .finally(() => setIsLoading(false));
   }, []);
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-96">
-        <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex justify-center items-center h-96 text-red-500 font-bold">
-        {error}
+      <div className="flex justify-center mt-60">
+        <div className="w-15 h-15 border-4 border-gray-300 border-t-green-500 rounded-full animate-spin"></div>
       </div>
     );
   }
