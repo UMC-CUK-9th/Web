@@ -15,12 +15,12 @@ const Navbar = () => {
           >인기 영화</NavLink>
         </li>
         <li>
-          <NavLink to="/now-playing"
+          <NavLink to="/now_playing"
             className={({ isActive }) => (isActive ? "text-green-500" : "text-gray-400")}
           >상영 중</NavLink>
         </li>
         <li>
-          <NavLink to="/top-rated"
+          <NavLink to="/top_rated"
             className={({ isActive }) => (isActive ? "text-green-500" : "text-gray-400")}
           >평점 높은</NavLink>
         </li>

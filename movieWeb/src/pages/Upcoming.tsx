@@ -5,12 +5,25 @@ import { fetchMovies } from "../services/FetchMovies";
 const Upcoming = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true); 
+  const [error, setError] = useState<string | null>(null);
+
 
   useEffect(() => {
-    setIsLoading(true); 
-    fetchMovies("now_playing")
-      .then(setMovies)
-      .finally(() => setIsLoading(false));
+    const loadMovies = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const results = await fetchMovies("upcoming");
+        setMovies(results);
+      } catch (err: unknown) {
+        setError("에러가 발생했습니다.");
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMovies();
   }, []);
 
   if (isLoading) {
@@ -20,6 +33,15 @@ const Upcoming = () => {
       </div>
     );
   }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center mt-20 text-red-500">
+        {error}
+      </div>
+    );
+  }
+
 
 
   return (
