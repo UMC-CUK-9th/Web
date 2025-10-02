@@ -5,6 +5,7 @@ import HomePage from './pages/home';
 import NotFound from './pages/not-found';
 import MoviesPage from './pages/movies';
 import RootLayout from './layout/root-layout';
+import MovieDetailPage from './pages/movieDetail';
 
 const router = createBrowserRouter([
   {
@@ -22,7 +23,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/movies/:movieId',
-        element: <MoviesPage />
+        element: <MovieDetailPage />
       },
       { 
         path: '*', 

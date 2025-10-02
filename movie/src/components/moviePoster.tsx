@@ -1,15 +1,18 @@
 import { useState } from "react";
 import type { Movie } from "../types/movie";
+import { useNavigate } from "react-router-dom";
 
 interface MoviePosterProps{
     movie:Movie;
 }
 const MoviePoster = ({movie}:MoviePosterProps) => {
     const [isHover, setIsHover] = useState<boolean>(false);
+    const navigate = useNavigate();
 
     console.log(movie);
     return (
         <div className="relative w-full h-full"
+            onClick={()=>navigate(`/movies/${movie.id}`)}
             onMouseEnter={()=>setIsHover(true)}
             onMouseLeave={()=>setIsHover(false)}>
             <img src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`} 
