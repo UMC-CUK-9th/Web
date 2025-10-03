@@ -1,7 +1,9 @@
 import "./App.css";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+import Layout from "./components/Layout";
 import Homepage from "./pages/HomePage";
 import MoviePage from "./pages/MoviePage";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import NotFoundPage from "./pages/NotFoundPage";
 import MovieDetailPage from "./pages/MovieDetailPage";
 
@@ -10,21 +12,25 @@ import MovieDetailPage from "./pages/MovieDetailPage";
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <Homepage />,
+    element: <Layout />,
     errorElement: <NotFoundPage />,
     children: [
+      {
+        index: true,
+        element: <Homepage />,
+      },
       {
         path: "movies/:category",
         element: <MoviePage />,
       },
       {
-        path: "movies/:movieId",
+        path: "movie/:id",
         element: <MovieDetailPage />,
       },
     ],
   },
 ]);
+
 
 function App() {
   return <RouterProvider router={router} />;

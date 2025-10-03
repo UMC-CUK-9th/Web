@@ -1,3 +1,3 @@
 export default function NotFoundPage() {
-  return <div>못찾겠다</div>;
+  return <div>자바나 하세요</div>;
 }
