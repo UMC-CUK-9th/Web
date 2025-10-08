@@ -1,19 +1,24 @@
-import "./App.css";
 import { useState } from "react";
+import ButtonGroup from "./components/ButtonGroup";
 
 function App() {
   const [count, setCount] = useState(0);
 
-  const handleIncrease = (): void => {
-    // setCount(count + 1);
-    setCount((prev) => prev + 1); // prev: 이전 상태값 -> 이렇게 하는게 좋음 
-    console.log(count);
+  const handleIncrement = () => {
+    setCount(count + 1);
+  };
+
+  const handleDecrement = () => {
+    setCount(count - 1);
   };
 
   return (
     <>
       <h1>{count}</h1>
-      <button onClick={handleIncrease}>증가</button>
+      <ButtonGroup
+        handleIncrement={handleIncrement}
+        handleDecrement={handleDecrement}
+      />
     </>
   );
 }
