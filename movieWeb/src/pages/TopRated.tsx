@@ -1,33 +1,17 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Movie } from "../types/movie";
 import { fetchMovies } from "../services/FetchMovies";
 import { Link } from "react-router-dom";
 import Loading from "../components/Loading";
+import { useCustomFetch } from "../hooks/useCustomFetch";
 
 const TopRated = () => {
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true); 
-  const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<number>(1);
 
-  useEffect(() => {
-    const loadMovies = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const results = await fetchMovies("top_rated", page);
-        setMovies(results);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (err: unknown) {
-        setError("에러가 발생했습니다.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadMovies();
-  }, [page]); 
-
+  const { data: movies, isLoading, error } = useCustomFetch<Movie[]>(
+    () => fetchMovies("top_rated", page),
+    [page]
+  );
 
   if (isLoading) {
     return <Loading />;
@@ -40,7 +24,6 @@ const TopRated = () => {
       </div>
     );
   }
-
 
   return (
     <div>
