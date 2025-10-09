@@ -2,6 +2,9 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/header";
 import useForm from "../hooks/useForm";
 import { validateSignin, type UserSigninInformation } from "../utils/validate";
+import { postSignin } from "../apis/auth";
+import { useLocalStorage } from "../hooks/useLocalStorage";
+import GoogleButton from "../components/googleButton";
 
 export default function LoginPage(){
     const {values, errors, touched, getInputProps}=useForm<UserSigninInformation>({
@@ -12,10 +15,22 @@ export default function LoginPage(){
         validate:validateSignin,
     })
 
+    const {setItem:setAccessItem}=useLocalStorage('accessToken');
+    const {setItem:setRefreshItem}=useLocalStorage('refreshToken');
+
     const navigate=useNavigate();
 
-    const handleSubmit=()=>{
-        navigate("/");
+    const handleSubmit=async(e:React.FormEvent)=>{
+        e.preventDefault();
+        try{
+            const {data}=await postSignin(values);
+            console.log(data.name);
+            setAccessItem(data.accessToken);
+            setRefreshItem(data.refreshToken);
+            navigate("/");
+        }catch(e){
+            console.log(e);
+        }
     }
 
     const isDisabled = 
@@ -24,9 +39,11 @@ export default function LoginPage(){
 
     return (
         <div className="flex h-[100dvh] items-center justify-center bg-black text-white">
-            <div className="w-90 h-100 flex flex-col items-center p-3">
+            <div className="w-90 flex flex-col items-center p-3 gap-8">
                 <Header title="로그인"/>
-                <form className="w-full pt-5 flex flex-col">
+                <GoogleButton />
+                
+                <form className="w-full flex flex-col" onSubmit={handleSubmit}>
                     <input
                         {...getInputProps("email")}
                         className="w-full border border-white h-10 rounded-md p-2"
@@ -42,8 +59,8 @@ export default function LoginPage(){
                     />
                     {errors?.password && touched?.password && <p className="text-red-500">{errors.password}</p>}
                     <button 
-                        className="w-full h-12 rounded-md bg-pink-500 cursor-pointer mt-5 disabled:bg-[#252525ff] disabled:cursor-default"
-                        onClick={handleSubmit}
+                        className="w-full h-12 rounded-md bg-pink-500 cursor-pointer mt-5 disabled:bg-[#252525ff] disabled:curso"
+                        type="submit"
                         disabled={isDisabled}>
                         로그인
                     </button>

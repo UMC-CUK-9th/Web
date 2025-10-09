@@ -14,14 +14,6 @@ export default function Header({ title }: HeaderProps) {
                 &lt;
             </button>
             <p className="">{title}</p>
-            <button className="w-full h-10 border border-white rounded-lg cursor-pointer">
-                구글 로그인 
-            </button>
-            <div className="flex items-center gap-8">
-                <hr className="w-30"/>
-                <p>OR</p>
-                <hr className="w-30"/>
-            </div>
         </div>
     );
 }
