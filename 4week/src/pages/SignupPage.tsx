@@ -5,31 +5,31 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { postSignup } from "../apis/auth";
 import { Link, useNavigate } from "react-router-dom";
 
-// 아이콘 SVG 컴포넌트들
+// 아이콘 SVG 컴포넌트들 (이전과 동일)
 const EyeIcon = ({ ...props }) => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
         <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
     </svg>
 );
-
 const EyeSlashIcon = ({ ...props }) => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.243 4.243L6.228 6.228" />
     </svg>
 );
-
 const AvatarIcon = ({ ...props }) => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
     </svg>
 );
 
+
 // Zod 스키마
 const step1Schema = z.object({
     email: z.string().email({ message: "이메일 형식이 올바르지 않습니다." }),
     password: z.string().min(8, { message: "비밀번호는 8자 이상 20자 이하" }),
-    passwordCheck: z.string().min(8, { message: "비밀번호와 값이 다릅니다!!" }),
+    // 수정: 최소 길이 오류 메시지를 올바르게 수정
+    passwordCheck: z.string().min(8, { message: "비밀번호는 8자 이상 20자 이하" }),
 }).refine((data) => data.password === data.passwordCheck, {
     message: "비밀번호와 값이 다릅니다",
     path: ["passwordCheck"],
@@ -66,8 +66,15 @@ const SignupPage = () => {
     };
 
     const onStep2Submit: SubmitHandler<Step2FormFields> = async (data) => {
-        const finalData = { email: signupData.email, password: signupData.password, name: data.name };
+        // 수정: 1단계 데이터가 없을 경우를 대비한 타입 가드 추가
+        if (!signupData.email || !signupData.password) {
+            alert("오류가 발생했습니다. 회원가입을 처음부터 다시 진행해주세요.");
+            setStep(1);
+            return; // 함수 실행 중단
+        }
 
+        const finalData = { email: signupData.email, password: signupData.password, name: data.name };
+        console.log("API로 보낼 데이터:", finalData);
         try {
             await postSignup(finalData);
             alert("회원가입이 완료되었습니다!");
@@ -114,7 +121,7 @@ const SignupPage = () => {
                         <h2 className="text-xl font-semibold">프로필 설정</h2>
                         <p className="text-sm text-gray-500 mb-2">사용하실 닉네임을 입력해주세요.</p>
 
-                        <input {...registerStep2('name')} type="text" placeholder="닉네임(꿀범)" className={`border w-[300px] p-[10px] focus:border-[#807bff] rounded-sm ${errorsStep2.name ? "border-red-500 bg-red-100" : "border-[#ccc]"}`}/>
+                        <input {...registerStep2('name')} type="text" placeholder="" className={`border w-[300px] p-[10px] focus:border-[#807bff] rounded-sm ${errorsStep2.name ? "border-red-500 bg-red-100" : "border-[#ccc]"}`}/>
                         {errorsStep2.name && <div className="text-red-500 text-sm">{errorsStep2.name.message}</div>}
 
                         <button type="submit" disabled={isSubmittingStep2} className="w-full bg-blue-600 text-white py-3 rounded-md text-lg font-medium hover:bg-blue-700 disabled:bg-gray-400">회원가입 완료</button>
