@@ -7,6 +7,7 @@ import TopRated from "./pages/TopRated";
 import Upcoming from "./pages/Upcoming";
 import MovieDetail from "./pages/MovieDetail";
 import Login from "./pages/Authentication/Login";
+import Signup from "./pages/Authentication/Signup";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/now_playing" element={<NowPlaying />} />
           <Route path="/movies/:movieId" element={<MovieDetail />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
         </Route>
       </Routes>
     </Router>
