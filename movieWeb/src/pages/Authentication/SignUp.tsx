@@ -97,27 +97,32 @@ const Signup = () => {
               <div className="flex-1 h-px bg-gray-300"></div>
             </div>
 
-            <AuthInput
-              type="email"
-              placeholder="이메일을 입력해주세요"
-              register={register("email")}
-              error={errors.email?.message}
-            />
-
-            <button
-              onClick={async () => {
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
                 const ok = await trigger("email");
                 if (ok) setStep(2);
               }}
-              disabled={!email || !!errors.email}
-              className={`mt-4 w-full py-2 rounded-lg text-white transition ${
-                !email || errors.email
-                  ? "bg-gray-300 cursor-not-allowed"
-                  : "bg-green-500 hover:bg-green-600"
-              }`}
             >
-              다음
-            </button>
+              <AuthInput
+                type="email"
+                placeholder="이메일을 입력해주세요"
+                register={register("email")}
+                error={errors.email?.message}
+              />
+
+              <button
+                type="submit"
+                disabled={!email || !!errors.email}
+                className={`mt-4 w-full py-2 rounded-lg text-white transition ${
+                  !email || errors.email
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-green-500 hover:bg-green-600"
+                }`}
+              >
+                다음
+              </button>
+            </form>
           </>
         )}
 
@@ -129,54 +134,60 @@ const Signup = () => {
               {email}
             </p>
 
-            {/* 비밀번호 */}
-            <div className="relative">
-              <AuthInput
-                type={showPw ? "text" : "password"}
-                placeholder="비밀번호 (6자 이상)"
-                register={register("password")}
-                error={errors.password?.message}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPw(!showPw)}
-                className="absolute right-3 top-2 text-gray-500"
-              >
-                {showPw ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
-
-            {/* 비밀번호 확인 */}
-            <div className="relative">
-              <AuthInput
-                type={showConfirm ? "text" : "password"}
-                placeholder="비밀번호 재확인"
-                register={register("confirmPw")}
-                error={errors.confirmPw?.message}
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirm(!showConfirm)}
-                className="absolute right-3 top-2 text-gray-500"
-              >
-                {showConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
-
-            <button
-              disabled={!password || !confirmPw || !!errors.password || !!errors.confirmPw}
-              onClick={async () => {
+            {/* 비번 */}
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
                 const ok = await trigger(["password", "confirmPw"]);
                 if (ok) setStep(3);
               }}
-              className={`mt-2 w-full py-2 rounded-lg text-white transition ${
-                password && confirmPw && !errors.password && !errors.confirmPw
-                  ? "bg-green-500 hover:bg-green-600"
-                  : "bg-gray-300 cursor-not-allowed"
-              }`}
             >
-              다음
-            </button>
+              <div className="relative mb-2">
+                <AuthInput
+                  type={showPw ? "text" : "password"}
+                  placeholder="비밀번호 (6자 이상)"
+                  register={register("password")}
+                  error={errors.password?.message}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPw(!showPw)}
+                  className="absolute right-3 top-2 text-gray-500"
+                >
+                  {showPw ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+
+              {/* 비번확인 */}
+              <div className="relative mb-2">
+                <AuthInput
+                  type={showConfirm ? "text" : "password"}
+                  placeholder="비밀번호 재확인"
+                  register={register("confirmPw")}
+                  error={errors.confirmPw?.message}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(!showConfirm)}
+                  className="absolute right-3 top-2 text-gray-500"
+                >
+                  {showConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+
+              <button
+                type="submit"
+                disabled={!password || !confirmPw || !!errors.password || !!errors.confirmPw}
+                className={`mt-2 w-full py-2 rounded-lg text-white transition ${
+                  password && confirmPw && !errors.password && !errors.confirmPw
+                    ? "bg-green-500 hover:bg-green-600"
+                    : "bg-gray-300 cursor-not-allowed"
+                }`}
+              >
+                다음
+              </button>
+            </form>
+
           </div>
         )}
 
@@ -206,6 +217,12 @@ const Signup = () => {
             <button
               type="submit"
               disabled={!nickname || !!errors.nickname}
+              onKeyDown={async (e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  await handleSubmit(onSubmit)();
+                }
+              }}
               className={`mt-3 w-full py-2 rounded-lg text-white transition ${
                 nickname && !errors.nickname
                   ? "bg-green-500 hover:bg-green-600"
