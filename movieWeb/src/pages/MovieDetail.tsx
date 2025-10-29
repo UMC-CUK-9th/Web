@@ -1,43 +1,32 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import Loading from "../components/Loading";
 import { fetchMovieData } from "../services/FetchMovieDetail";
 import type { MovieDetailType, PersonType, Genre } from "../types/movieDetail";
+import { useCustomFetch } from "../hooks/useCustomFetch";
 
 const MovieDetail = () => {
   const { movieId } = useParams();
-  const [movie, setMovie] = useState<MovieDetailType | null>(null);
-  const [people, setPeople] = useState<PersonType[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
+  const { data, isLoading, error } = useCustomFetch(
+    () => {
+      if (!movieId) throw new Error("영화 ID가 없습니다.");
+      return fetchMovieData(movieId);
+    },
+    [movieId]
+  );
 
-        if (!movieId) return;
-
-        const { detail, credits } = await fetchMovieData(movieId);
-        setMovie(detail);
-
-        const combined = [...credits.crew, ...credits.cast];
-        const uniquePeople = Array.from(
-          new Map(combined.map((p) => [p.id, p])).values()
-        );
-
-        setPeople(uniquePeople);
-      } catch {
-        setError("오류가 발생했습니다.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
-  }, [movieId]);
-
+  const movie: MovieDetailType | null = data?.detail || null;
+  const people: PersonType[] = useMemo(() => {
+    if (!data?.credits) return [];
+    
+    const combined = [...data.credits.crew, ...data.credits.cast];
+    const uniquePeople = Array.from(
+      new Map(combined.map((p) => [p.id, p])).values()
+    );
+    
+    return uniquePeople;
+  }, [data]);
 
   if (isLoading) return <Loading />;
   if (error)
@@ -76,7 +65,7 @@ const MovieDetail = () => {
 
           <ul className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6">
             {people
-              .filter((p) => p.profile_path) // 이미지 있는 사람만
+              .filter((p) => p.profile_path)
               .map((p) => (
                 <li key={`${p.id}-${p.name}`} className="flex flex-col items-center">
                   <img
@@ -93,10 +82,8 @@ const MovieDetail = () => {
                 </li>
               ))}
           </ul>
-
         </div>
       )}
-
     </div>
   );
 };
