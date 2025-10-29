@@ -7,6 +7,7 @@ import SignUpPage from "./pages/signup";
 import NotFoundPage from "./pages/notFound";
 import ProtectedLayout from "./layouts/protected-layout";
 import MyPage from "./pages/my";
+import RedirectPage from "./pages/redirect";
 
 const PublicRouter = {
   path: "/",
@@ -18,17 +19,22 @@ const PublicRouter = {
       element: <HomePage />,
     },
     {
-      path: "/login",
+      path: "login",
       element: <LoginPage />,
     },
     {
-      path: "/signUp",
+      path: "signUp",
       element: <SignUpPage />,
+    },
+    {
+      path: "v1/auth/google/callback",
+      element: <RedirectPage />,
     },
   ],
 };
 
 const ProtectedRouter = {
+  path: "/",
   element: (
     <ProtectedLayout>
       <RootLayout />
@@ -37,7 +43,7 @@ const ProtectedRouter = {
   errorElement: <NotFoundPage />,
   children: [
     {
-      path: "/my",
+      path: "my",
       element: <MyPage />,
     },
   ],
