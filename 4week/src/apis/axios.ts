@@ -2,29 +2,97 @@
 
 import axios from "axios";
 import { LOCAL_STORAGE_KEY } from "../constants/key";
+import { useLocalStorage } from "../hooks/useLocalStorage";
+import type { InternalAxiosRequestConfig } from "axios";
+
+interface CustomInternalAxiosRequestConfig extends InternalAxiosRequestConfig {
+    _retry?: boolean; // 요청 재시도 여부를 나타내는 플래그
+}
+
+// 전역 변수로 refresh 요청의 프로미스를 저장해서 중복 요청을 방지
+let refreshPromise: Promise<string> | null = null;
 
 export const axiosInstance = axios.create({
     baseURL: import.meta.env.VITE_SERVER_API_URL,
+    withCredentials:true,
 });
 
-// Axios 요청 인터셉터 추가
+// 요청 인터셉터 - Access Token 자동 포함
 axiosInstance.interceptors.request.use(
     (config) => {
-        // 로컬 스토리지에서 토큰을 가져옵니다.
-        const storedToken = localStorage.getItem(LOCAL_STORAGE_KEY.accessToken);
-        
-        // useLocalStorage 훅은 값을 JSON 문자열로 저장하므로, parse 해줍니다.
-        const token = storedToken ? JSON.parse(storedToken) : null;
+        const { getItem } = useLocalStorage(LOCAL_STORAGE_KEY.accessToken);
+        const accessToken = getItem();
 
-        // 토큰이 있으면 Authorization 헤더를 설정합니다.
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+        if (accessToken) {
+            config.headers = config.headers || {};
+            config.headers["Authorization"] = `Bearer ${accessToken}`;
         }
-        
+
         return config;
     },
     (error) => {
-        // 요청 에러 처리
+        return Promise.reject(error);
+    }
+);
+
+// 응답 인터셉터 - 401 발생 시 Refresh Token으로 토큰 갱신 시도
+axiosInstance.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+        const originalRequest: CustomInternalAxiosRequestConfig = error.config;
+
+        // 401 + 재시도한 적 없는 요청만 처리
+        if (error.response && error.response.status === 401 && !originalRequest._retry) {
+            // Refresh API 자체가 401이면 강제 로그아웃
+            if (originalRequest.url === "/v1/auth/refresh") {
+                const { removeItem: removeAccessToken } = useLocalStorage(LOCAL_STORAGE_KEY.accessToken);
+                const { removeItem: removeRefreshToken } = useLocalStorage(LOCAL_STORAGE_KEY.refreshToken);
+
+                removeAccessToken();
+                removeRefreshToken();
+                window.location.href = "/login";
+                return Promise.reject(error);
+            }
+
+            originalRequest._retry = true; // 재시도 플래그
+
+            // 이미 refresh 요청이 진행 중인 경우 → 그 요청 완료를 기다린 뒤 재시도
+            if (!refreshPromise) {
+                refreshPromise = (async () => {
+                    const { getItem: getRefreshToken } = useLocalStorage(LOCAL_STORAGE_KEY.refreshToken);
+                    const refreshToken = getRefreshToken();
+
+                    const { data } = await axiosInstance.post("/v1/auth/refresh", {
+                        refresh: refreshToken,
+                    });
+
+                    const { setItem: setAccessToken } = useLocalStorage(LOCAL_STORAGE_KEY.accessToken);
+                    const { setItem: setRefreshToken } = useLocalStorage(LOCAL_STORAGE_KEY.refreshToken);
+
+                    setAccessToken(data.data.accessToken);
+                    setRefreshToken(data.data.refreshToken);
+
+                    return data.data.accessToken;
+                })()
+                    .catch(() => {
+                        const { removeItem: removeAccessToken } = useLocalStorage(LOCAL_STORAGE_KEY.accessToken);
+                        const { removeItem: removeRefreshToken } = useLocalStorage(LOCAL_STORAGE_KEY.refreshToken);
+
+                        removeAccessToken();
+                        removeRefreshToken();
+                    })
+                    .finally(() => {
+                        refreshPromise = null;
+                    });
+            }
+
+            // refresh 요청 완료 후 원래 요청 재시도
+            return refreshPromise.then((newAccessToken) => {
+                originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+                return axiosInstance(originalRequest);
+            });
+        }
+
         return Promise.reject(error);
     }
 );

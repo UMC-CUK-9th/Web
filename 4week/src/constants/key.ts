@@ -1,3 +1,4 @@
-export const LOCAL_STORAGE_KEY : {accessToken: string} = {
-    'accessToken' : 'accessToken'
+export const LOCAL_STORAGE_KEY : { accessToken: string; refreshToken: string } = {
+    'accessToken' : 'accessToken',
+    'refreshToken': 'refreshToken'
 }
