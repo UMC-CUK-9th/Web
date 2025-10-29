@@ -99,7 +99,7 @@ const LoginPage = () => {
                     <div className="flex items-center justify-center gap-4">
                         {/* 3. 이미지 크기 고정 (예: w-6 h-6) */}
                         <img 
-                            src={"/images/google_img.png"} 
+                            src={"/images/google.png"} 
                             className="w-6 h-6" // 크기 지정
                             alt="Google logo" 
                         />
