@@ -27,7 +27,6 @@ export type RequestSigninDto = {
   password: string;
 };
 
-//로그아웃
 export type ResponseSigninDto = CommonResponse<{
   id: number;
   name: string;
