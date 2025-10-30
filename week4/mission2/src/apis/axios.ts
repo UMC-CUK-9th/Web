@@ -33,7 +33,7 @@ axiosInstance.interceptors.request.use(
     }
 );
 
-// 응답 인터셉터 - 401 발생 시 Refresh Token으로 토큰 갱신 시도
+
 axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {

@@ -27,6 +27,11 @@ const LoginPage = () => {
   navigate("/my");
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href =
+      import.meta.env.VITE_SERVER_API_URL + `/v1/auth/google/login`;
+  };
+
   const isDisabled =
     Object.values(error || {}).some((e) => e.length > 0) ||
     values.email === "" ||
@@ -124,6 +129,19 @@ const LoginPage = () => {
     }`}
 >
   로그인
+</button>
+
+<button
+  type="button"
+  onClick={handleGoogleLogin}
+  className={`w-full py-3 rounded-md text-lg font-medium mt-6 transition-all duration-200
+    ${
+      isDisabled
+        ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+        : "!bg-pink-500 !text-white hover:!bg-pink-600 active:!bg-pink-700"
+    }`}
+>
+  구글로그인
 </button>
 
           {/* 회원가입 안내 */}

@@ -80,7 +80,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
       console.error("로그아웃 오류",error);
       alert("로그아웃 실패");
     }
-  };
+};
 
   return (
     <AuthContext.Provider value={{ accessToken, refreshToken, login, logout }}>
