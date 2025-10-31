@@ -4,6 +4,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import z from "zod";
 import { postSignup } from "../apis/auth.ts";
 import { useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const schema = z.object({
     email: z.string().email({message: "올바른 이메일 형식을 입력해주세요."}),
@@ -26,7 +27,8 @@ const SignUpPage = () => {
   const [step, setStep] = useState(1);
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPasswordValid, setIsPasswordValid] = useState(false);
-  // Removed unused isNameValid state
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [passwordCheckVisible, setPasswordCheckVisible] = useState(false);
 
   const navigate = useNavigate();
 
@@ -126,30 +128,48 @@ const SignUpPage = () => {
             <div className="flex-1 text-center font-semibold text-black mb-2 bg-sky-300 rounded">
               {watch("email")}
             </div>
-            <div>
+            <div className="relative">
               <input
                 {...register("password")}
                 className={`w-full p-3 bg-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500
                   ${errors.password ? "border-red-500" : "border-gray-600"}`}
-                type="password"
+                type={passwordVisible ? "text" : "password"}
                 placeholder="비밀번호를 입력해주세요"
               />
-              {errors.password && (
-                <div className="mt-1 text-sm text-red-400">{errors.password.message}</div>
-              )}
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-pink-500"
+                onClick={() => setPasswordVisible(v => !v)}
+                tabIndex={-1}
+                aria-label={passwordVisible ? "비밀번호 숨기기" : "비밀번호 보기"}
+              >
+                {passwordVisible ? <FaEyeSlash size={20}/> : <FaEye size={20}/>}
+              </button>
             </div>
-            <div>
+            {errors.password && (
+              <div className="mt-1 text-sm text-red-400">{errors.password.message}</div>
+            )}
+            <div className="relative">
               <input
                 {...register("passwordCheck")}
                 className={`w-full p-3 bg-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500
                   ${errors.passwordCheck ? "border-red-500" : "border-gray-600"}`}
-                type="password"
+                type={passwordCheckVisible ? "text" : "password"}
                 placeholder="비밀번호 확인"
               />
-              {errors.passwordCheck && (
-                <div className="mt-1 text-sm text-red-400">{errors.passwordCheck.message}</div>
-              )}
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-pink-500"
+                onClick={() => setPasswordCheckVisible(v => !v)}
+                tabIndex={-1}
+                aria-label={passwordCheckVisible ? "비밀번호 숨기기" : "비밀번호 보기"}
+              >
+                {passwordCheckVisible ? <FaEyeSlash size={20}/> : <FaEye size={20}/>}
+              </button>
             </div>
+            {errors.passwordCheck && (
+              <div className="mt-1 text-sm text-red-400">{errors.passwordCheck.message}</div>
+            )}
             <button
               type="submit"
               disabled={!isPasswordValid}
