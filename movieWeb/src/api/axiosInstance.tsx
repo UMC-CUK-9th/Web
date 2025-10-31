@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8000/v1";
+const BASE_URL = import.meta.env.VITE_SERVER_API_URL + "/v1";
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -10,23 +10,32 @@ const axiosInstance = axios.create({
 });
 
 let isRefreshing = false;
-let refreshSubscribers: Array<(token: string) => void> = [];
+type RefreshSubscriber = {
+  resolve: (token: string) => void;
+  reject: (error: unknown) => void;
+};
 
-const subscribeTokenRefresh = (cb: (token: string) => void): void => {
-  refreshSubscribers.push(cb);
+let refreshSubscribers: RefreshSubscriber[] = [];
+
+const subscribeTokenRefresh = (subscriber: RefreshSubscriber): void => {
+  refreshSubscribers.push(subscriber);
 };
 
 const onRefreshed = (newToken: string): void => {
-  refreshSubscribers.forEach((cb) => cb(newToken));
+  refreshSubscribers.forEach(({ resolve }) => resolve(newToken));
+   refreshSubscribers = [];
+ };
+
+const onRefreshFailed = (error: unknown): void => {
+  refreshSubscribers.forEach(({ reject }) => reject(error));
   refreshSubscribers = [];
 };
 
-
 // 요청 시 accessToken 자동 첨부
 axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+const token = localStorage.getItem("accessToken");
+  if (token && token !== "null" && token !== "undefined") {
+    config.headers.Authorization = `Bearer ${token.replace(/"/g, "")}`;
   }
   return config;
 });
@@ -49,14 +58,16 @@ axiosInstance.interceptors.response.use(
       }
 
       if (isRefreshing) {
-        // 이미 refresh 중이면 큐에 등록 후 대기
-        return new Promise((resolve) => {
-          subscribeTokenRefresh((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            resolve(axiosInstance(originalRequest));
+        return new Promise((resolve, reject) => {
+          subscribeTokenRefresh({
+            resolve: (token) => {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              resolve(axiosInstance(originalRequest));
+            },
+            reject,
           });
         });
-      }
+       }
 
       isRefreshing = true;
 
@@ -80,6 +91,7 @@ axiosInstance.interceptors.response.use(
       } catch (refreshError) {
         console.error("토큰 갱신 실패:", refreshError);
         isRefreshing = false;
+        onRefreshFailed(refreshError);
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         window.location.href = "/login";

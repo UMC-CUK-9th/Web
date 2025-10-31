@@ -28,7 +28,7 @@ const Navbar = () => {
             to="/"
             end
             className={({ isActive }) =>
-              isActive ? "text-green-500d" : "text-gray-400"
+              isActive ? "text-green-500" : "text-gray-400"
             }
           >
             홈
