@@ -25,6 +25,7 @@ const GoogleLoginRedirectPage = () => {
       setAccessToken(accessToken);
       if (refreshToken) setRefreshToken(refreshToken);
       if (userName) localStorage.setItem("userName", userName);
+      window.dispatchEvent(new Event("authChange"));
       window.location.href = "/";
     }
   }, [setAccessToken, setRefreshToken]);

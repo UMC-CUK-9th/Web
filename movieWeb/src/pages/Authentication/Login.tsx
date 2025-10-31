@@ -54,8 +54,6 @@ const Login = () => {
       setAccessToken(result.data.accessToken);
       setRefreshToken(result.data.refreshToken);
 
-      localStorage.setItem(LOCAL_STORAGE_KEY.accessToken, result.data.accessToken);
-      localStorage.setItem(LOCAL_STORAGE_KEY.refreshToken, result.data.refreshToken);
       localStorage.setItem("userName", result.data.name);
 
       window.dispatchEvent(new Event("authChange"));
