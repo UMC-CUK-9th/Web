@@ -56,6 +56,7 @@ const Login = () => {
       setAccessToken(result.data.accessToken);
       setRefreshToken(result.data.refreshToken);
       localStorage.setItem("userName", result.data.name);
+      window.dispatchEvent(new Event("authChange"));
 
       alert(`${result.data.name}님, 환영합니다!`);
       navigate("/");
