@@ -1,7 +1,8 @@
 import type { CommonResponse } from "./common";
+import { axiosInstance } from "../api/axios";
 
 export type RequestSignupDto = {
-  name: string;
+  name?: string;
   email: string;
   bio?: string;
   avatar?: string;
