@@ -1,5 +1,4 @@
 import type { CommonResponse } from "./common";
-import { axiosInstance } from "../api/axios";
 
 export type RequestSignupDto = {
   name?: string;
@@ -27,6 +26,11 @@ export type RequestSigninDto = {
 export type ResponseSigninDto = CommonResponse<{
   id: number;
   name: string;
+  accessToken: string;
+  refreshToken: string;
+}>;
+
+export type ResponseRefreshTokenDto = CommonResponse<{
   accessToken: string;
   refreshToken: string;
 }>;

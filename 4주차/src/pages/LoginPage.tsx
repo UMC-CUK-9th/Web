@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import useForm from "../hooks/useForm";
-import { type UserSigninInformatin, validateSignin } from "../utils/validate";
+import { type UserSigninInformation, validateSignin } from "../utils/validate";
 import MovePage from "../pages/MovePage";
 import { useEffect, useState } from "react";
 
@@ -15,7 +15,7 @@ const LoginPage = () => {
     if (accessToken) navigate("/");
   }, [navigate, accessToken]);
 
-  const { values, error, touch, getInputProps } = useForm<UserSigninInformatin>(
+  const { values, error, touch, getInputProps } = useForm<UserSigninInformation>(
     {
       initialValue: { email: "", password: "" },
       validate: validateSignin,
