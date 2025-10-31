@@ -55,6 +55,9 @@ const Login = () => {
       // ✅ 토큰 저장
       setAccessToken(result.data.accessToken);
       setRefreshToken(result.data.refreshToken);
+      
+      localStorage.setItem("accessToken", result.data.accessToken);
+      localStorage.setItem("refreshToken", result.data.refreshToken);
       localStorage.setItem("userName", result.data.name);
       window.dispatchEvent(new Event("authChange"));
 
