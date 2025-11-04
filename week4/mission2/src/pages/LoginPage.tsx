@@ -1,14 +1,21 @@
-import { postSignin } from "../apis/auth.ts";
-import { LOCAL_STORAGE_KEY } from "../constants/key.ts";
 import useForm from "../hooks/useForm";
-import { useLocalStorage } from "../hooks/useLocalStorage.ts";
 import { type UserSigninInformatin, validateSignin } from "../utils/validate";
 import { useNavigate } from "react-router-dom";
-import { FaArrowLeft } from "react-icons/fa"; //
+import { FaArrowLeft } from "react-icons/fa"; 
+import { useAuth } from "../context/AuthContext"
+import { useEffect } from "react";
+
 
 const LoginPage = () => {
+  const {login,accessToken} = useAuth();
   const navigate = useNavigate();
-  const { setItem } = useLocalStorage(LOCAL_STORAGE_KEY.accessToken);
+
+  useEffect(()=>{
+    if(accessToken){
+      navigate("/")
+    }
+  },[navigate, accessToken]);
+ 
 
   const { values, error, touched, getInputProps } = useForm<UserSigninInformatin>({
     initialValue: { email: "", password: "" },
@@ -16,14 +23,13 @@ const LoginPage = () => {
   });
 
   const handleSubmit = async () => {
-    try {
-      const response = await postSignin(values);
-      setItem(response.data.accessToken);
-      alert("로그인 성공! 🎉");
-      navigate("/"); 
-    } catch (error: any) {
-      alert(`로그인 실패: ${error?.message}`);
-    }
+  await login(values);
+  navigate("/my");
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href =
+      import.meta.env.VITE_SERVER_API_URL + `/v1/auth/google/login`;
   };
 
   const isDisabled =
@@ -61,8 +67,8 @@ const LoginPage = () => {
       {/* 로그인 박스 */}
       <div className="flex items-center justify-center min-h-screen">
         <div className="bg-white shadow-lg rounded-2xl px-10 py-12 flex flex-col items-center w-[380px] mt-10 relative">
-          
-          
+
+
           <button
             onClick={() => navigate(-1)}
             className="absolute left-5 top-5 text-gray-400 hover:text-gray-700 transition"
@@ -123,6 +129,19 @@ const LoginPage = () => {
     }`}
 >
   로그인
+</button>
+
+<button
+  type="button"
+  onClick={handleGoogleLogin}
+  className={`w-full py-3 rounded-md text-lg font-medium mt-6 transition-all duration-200
+    ${
+      isDisabled
+        ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+        : "!bg-pink-500 !text-white hover:!bg-pink-600 active:!bg-pink-700"
+    }`}
+>
+  구글로그인
 </button>
 
           {/* 회원가입 안내 */}

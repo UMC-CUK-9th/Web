@@ -7,11 +7,13 @@ export const useLocalStorage = (key: string) => {
     }
   };
 
-  const getItem = () => {
+  const getItem = (): string | null => {
     try {
-      const item: string | null = window.localStorage.getItem(key);
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : null;
     } catch (e) {
-      console.log(e);
+      console.error(e);
+      return null;
     }
   };
 
