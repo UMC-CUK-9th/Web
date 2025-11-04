@@ -1,9 +1,27 @@
 import { NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const Navbar = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(!!localStorage.getItem("accessToken"));
+
+  useEffect(() => {
+    const handleAuthChange = () => {
+      setIsLoggedIn(!!localStorage.getItem("accessToken"));
+    };
+
+    //로그인/로그아웃 감지 
+    window.addEventListener("storage", handleAuthChange); //다른탭
+    window.addEventListener("authChange", handleAuthChange); //같은탭
+
+    return () => {
+      window.removeEventListener("storage", handleAuthChange);
+      window.removeEventListener("authChange", handleAuthChange);
+    };
+  }, []);
+
   return (
-    <nav className="flex justify-between items-center m-4">
-      {/* 왼-페이지 */}
+    <nav className="flex justify-between items-center m-4 pr-2 pl-2">
+      {/* 왼 */}
       <ul className="flex gap-6">
         <li>
           <NavLink
@@ -20,7 +38,7 @@ const Navbar = () => {
           <NavLink
             to="/popular"
             className={({ isActive }) =>
-              isActive ? "text-green-500d" : "text-gray-400"
+              isActive ? "text-green-500" : "text-gray-400"
             }
           >
             인기 영화
@@ -58,20 +76,39 @@ const Navbar = () => {
         </li>
       </ul>
 
-      {/* 오-로긴/회언가입*/}
+      {/* 오 */}
       <div className="flex gap-4">
-        <NavLink
-          to="/login"
-          className="px-4 py-2 text-sm text-gray-700 hover:text-green-500 transition"
-        >
-          로그인
-        </NavLink>
-        <NavLink
-          to="/signup"
-          className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 transition"
-        >
-          회원가입
-        </NavLink>
+        {isLoggedIn ? (
+          <>
+            <NavLink
+              to="/logout"
+              className="px-4 py-2 text-sm text-gray-700 hover:text-green-500 transition"
+            >
+              로그아웃
+            </NavLink>
+            <NavLink
+              to="/mypage"
+              className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 transition"
+            >
+              마이페이지
+            </NavLink>
+          </>
+        ) : (
+          <>
+            <NavLink
+              to="/login"
+              className="px-4 py-2 text-sm text-gray-700 hover:text-green-500 transition"
+            >
+              로그인
+            </NavLink>
+            <NavLink
+              to="/signup"
+              className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 transition"
+            >
+              회원가입
+            </NavLink>
+          </>
+        )}
       </div>
     </nav>
   );

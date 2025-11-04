@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signin } from "../../api/authAPI";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import AuthInput from "../../components/common/AuthInput";
+import { LOCAL_STORAGE_KEY } from "../../constants/key";
 
 // Zod 스키마
 const loginSchema = z.object({
@@ -12,23 +13,21 @@ const loginSchema = z.object({
     .string()
     .min(1, "이메일을 입력해주세요.")
     .email("유효하지 않은 이메일 형식입니다."),
-  password: z
-    .string()
-    .min(6, "비밀번호는 최소 6자 이상이어야 합니다."),
+  password: z.string().min(6, "비밀번호는 최소 6자 이상이어야 합니다."),
 });
 
-// 타입 추론
+
 type LoginFormData = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const navigate = useNavigate();
 
   const { setValue: setAccessToken } = useLocalStorage<string | null>(
-    "accessToken",
+    LOCAL_STORAGE_KEY.accessToken,
     null
   );
   const { setValue: setRefreshToken } = useLocalStorage<string | null>(
-    "refreshToken",
+    LOCAL_STORAGE_KEY.refreshToken,
     null
   );
 
@@ -52,17 +51,24 @@ const Login = () => {
 
       if (!result.status) throw new Error(result.message);
 
-      // ✅ 토큰 저장
       setAccessToken(result.data.accessToken);
       setRefreshToken(result.data.refreshToken);
+
       localStorage.setItem("userName", result.data.name);
+
+      window.dispatchEvent(new Event("authChange"));
 
       alert(`${result.data.name}님, 환영합니다!`);
       navigate("/");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       alert(error.message || "로그인 실패");
     }
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href =
+      import.meta.env.VITE_SERVER_API_URL + "/v1/auth/google/login";
   };
 
   return (
@@ -83,6 +89,7 @@ const Login = () => {
         <button
           type="button"
           className="w-full py-2 mb-5 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-100 transition"
+          onClick={handleGoogleLogin}
         >
           <img
             src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -131,10 +138,7 @@ const Login = () => {
         {/* 회원가입 링크 */}
         <p className="text-center text-sm text-gray-500 mt-5">
           아직 회원이 아니신가요?{" "}
-          <a
-            href="/signup"
-            className="text-green-500 font-medium hover:underline"
-          >
+          <a href="/signup" className="text-green-500 font-medium hover:underline">
             회원가입
           </a>
         </p>
