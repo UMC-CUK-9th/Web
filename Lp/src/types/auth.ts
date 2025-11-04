@@ -1,31 +1,31 @@
 import type { CommonResponse } from "./common";
 
-export type RequestSignupDto={
-    name:string;
-    email:string;
-    bio?:string;
-    avater?:string;
-    password:string;
-}
+export type RequestSignupDto = {
+  name: string;
+  email: string;
+  bio?: string;
+  avater?: string;
+  password: string;
+};
 
 export type ResponseSignupDto = CommonResponse<{
-    id:number;
-    name:string;
-    email:string;
-    bio:string|null;
-    avatar:string|null;
-    createAt:Date;
-    updateAt:Date;
-}>
+  id: number;
+  name: string;
+  email: string;
+  bio: string | null;
+  avatar: string | null;
+  createAt: Date;
+  updateAt: Date;
+}>;
 
-export type RequestSigninDto={
-    email:string;
-    password:string;
-}
+export type RequestSigninDto = {
+  email: string;
+  password: string;
+};
 
-export type ResponseSigninDto=CommonResponse<{
-    id:number;
-    name:string;
-    accessToken:string;
-    refreshToken:string;
-}>
+export type ResponseSigninDto = CommonResponse<{
+  id: number;
+  name: string;
+  accessToken: string;
+  refreshToken: string;
+}>;
