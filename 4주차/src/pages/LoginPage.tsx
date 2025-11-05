@@ -15,7 +15,7 @@ const LoginPage = () => {
     if (accessToken) navigate("/");
   }, [navigate, accessToken]);
 
-  const { values, error, touch, getInputProps } = useForm<UserSigninInformation>(
+  const { values, errors, touched, getInputProps } = useForm<UserSigninInformation>(
     {
       initialValue: { email: "", password: "" },
       validate: validateSignin,
@@ -43,7 +43,7 @@ const LoginPage = () => {
   };
 
   const isDisabled =
-    Object.values(error || {}).some((e) => e.length > 0) ||
+    Object.values(errors || {}).some((e) => e.length > 0) ||
     Object.values(values).some((v) => v === "");
 
   return (
@@ -77,12 +77,12 @@ const LoginPage = () => {
                 type="email"
                 placeholder="name@example.com"
                 className={`w-full rounded-xl border px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none transition
-                ${error?.email && touch?.email ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-gray-300 focus:ring-2 focus:ring-gray-200"}`}
+                ${errors?.email && touched?.email ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-gray-300 focus:ring-2 focus:ring-gray-200"}`}
                 autoComplete="email"
                 autoFocus
               />
-              {error?.email && touch?.email && (
-                <p className="mt-1 text-xs text-red-500">{error.email}</p>
+              {errors?.email && touched?.email && (
+                <p className="mt-1 text-xs text-red-500">{errors.email}</p>
               )}
             </div>
 
@@ -96,7 +96,7 @@ const LoginPage = () => {
               </label>
               <div
                 className={`relative rounded-xl border transition ${
-                  error?.password && touch?.password
+                  errors?.password && touched?.password
                     ? "border-red-400 bg-red-50"
                     : "border-gray-200 focus-within:border-gray-300 focus-within:ring-2 focus-within:ring-gray-200"
                 }`}
@@ -118,8 +118,8 @@ const LoginPage = () => {
                   {showPassword ? "숨기기" : "보기"}
                 </button>
               </div>
-              {error?.password && touch?.password && (
-                <p className="mt-1 text-xs text-red-500">{error.password}</p>
+              {errors?.password && touched?.password && (
+                <p className="mt-1 text-xs text-red-500">{errors.password}</p>
               )}
             </div>
 
