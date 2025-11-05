@@ -8,6 +8,9 @@ import NotFoundPage from "./pages/notFound";
 import ProtectedLayout from "./layouts/protected-layout";
 import MyPage from "./pages/my";
 import RedirectPage from "./pages/redirect";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import LpDetailPage from "./pages/lpDetail";
 
 const PublicRouter = {
   path: "/",
@@ -46,13 +49,22 @@ const ProtectedRouter = {
       path: "my",
       element: <MyPage />,
     },
+    {
+      path: "lp/:id",
+      element: <LpDetailPage />,
+    },
   ],
 };
 
 const router = createBrowserRouter([PublicRouter, ProtectedRouter]);
-
+const queryClient = new QueryClient();
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  );
 }
 
 export default App;

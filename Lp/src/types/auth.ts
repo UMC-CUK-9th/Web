@@ -4,7 +4,7 @@ export type RequestSignupDto = {
   name: string;
   email: string;
   bio?: string;
-  avater?: string;
+  avatar?: string;
   password: string;
 };
 

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
+import { LoadingSpinner } from "../components/loadingSpinner";
 
 const RedirectPage = () => {
   const { setItem: setAccessToken } = useLocalStorage("accessToken");
@@ -15,8 +16,8 @@ const RedirectPage = () => {
       setRefreshToken(refreshToken);
       window.location.href = "/my";
     }
-  }, [setAccessToken, setRefreshToken]);
-  return <div>구글 로그인 리다이렉 화면</div>;
+  }, []);
+  return <LoadingSpinner />;
 };
 
 export default RedirectPage;
