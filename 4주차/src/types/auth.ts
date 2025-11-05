@@ -1,7 +1,7 @@
 import type { CommonResponse } from "./common";
 
 export type RequestSignupDto = {
-  name: string;
+  name?: string;
   email: string;
   bio?: string;
   avatar?: string;
@@ -26,6 +26,11 @@ export type RequestSigninDto = {
 export type ResponseSigninDto = CommonResponse<{
   id: number;
   name: string;
+  accessToken: string;
+  refreshToken: string;
+}>;
+
+export type ResponseRefreshTokenDto = CommonResponse<{
   accessToken: string;
   refreshToken: string;
 }>;

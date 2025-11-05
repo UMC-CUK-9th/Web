@@ -1,81 +1,159 @@
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import useForm from "../hooks/useForm";
-import { validateSignin, type UserSigninInformation } from "../utils/validate";
+import { type UserSigninInformation, validateSignin } from "../utils/validate";
+import MovePage from "../pages/MovePage";
+import { useEffect, useState } from "react";
 
-export const LoginPage = () => {
-    const navigate = useNavigate();
+const LoginPage = () => {
+  const { login, accessToken } = useAuth();
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-    const { values, errors, touched, getInputProps } = useForm<UserSigninInformation>({
-        initialValue: {
-            email: "",
-            password: "",
-        },
-        validate: validateSignin
-    });
+  useEffect(() => {
+    if (accessToken) navigate("/");
+  }, [navigate, accessToken]);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log(values);
+  const { values, errors, touched, getInputProps } = useForm<UserSigninInformation>(
+    {
+      initialValue: { email: "", password: "" },
+      validate: validateSignin,
+    }
+  );
 
-    };
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    try {
+      await login(values);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-    const isDisabled =
-        Object.values(errors || {}).some(error => !!error) ||
-        Object.values(values).some(value => value === "");
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isDisabled || submitting) return;
+    await handleSubmit();
+  };
 
-    return (
-    <div className="flex items-center justify-center min-h-screen bg-white text-gray-900">
-            <div className="w-full max-w-sm p-8 space-y-6 bg-gray-800 rounded-lg shadow-xl text-white">
-                <div className="relative flex items-center justify-center mb-4">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="absolute left-0 p-2 transition-colors rounded-full hover:bg-gray-700"
-                        aria-label="뒤로 가기"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-                    </button>
-                    <h1 className="text-2xl font-bold text-white">로그인</h1>
-                </div>
+  const handleGoogleLogin = () => {
+    window.location.href =
+      import.meta.env.VITE_SERVER_API_URL + `/v1/auth/google/login`;
+  };
 
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                    {/* 이메일 입력 필드 */}
-                    <div>
-                        <input
-                            {...getInputProps("email")}
-                            className={`w-full p-3 bg-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500
-                                ${errors?.email && touched?.email ? "border-red-500" : "border-gray-600"}`}
-                            type="email"
-                            placeholder="이메일을 입력해주세요"
-                        />
-                        {errors?.email && touched?.email && (
-                            <div className="mt-1 text-sm text-red-400">{errors.email}</div>
-                        )}
-                    </div>
+  const isDisabled =
+    Object.values(errors || {}).some((e) => e.length > 0) ||
+    Object.values(values).some((v) => v === "");
 
-                    {/* 비밀번호 입력 필드 */}
-                    <div>
-                        <input
-                            {...getInputProps("password")}
-                            className={`w-full p-3 bg-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500
-                                ${errors?.password && touched?.password ? "border-red-500" : "border-gray-600"}`}
-                            type="password"
-                            placeholder="비밀번호를 입력해주세요"
-                        />
-                        {errors?.password && touched?.password && (
-                            <div className="mt-1 text-sm text-red-400">{errors.password}</div>
-                        )}
-                    </div>
-
-                    {/* 로그인 버튼 */}
-                    <button
-                        type="submit"
-                        disabled={isDisabled}
-                        className="w-full py-3 mt-4 font-semibold text-white transition-colors bg-pink-600 rounded-md hover:bg-pink-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 disabled:bg-gray-500 disabled:cursor-not-allowed"
-                    >
-                        로그인
-                    </button>
-                </form>
-            </div>
+  return (
+    <div className="min-h-screen w-full bg-gray-50 flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        {/* 헤더 영역 */}
+        <div className="flex items-center mb-6">
+          <div className="flex-none">
+            <MovePage />
+          </div>
+          <div className="flex-1 text-center font-semibold text-2xl text-gray-900">
+            로그인
+          </div>
+          <div className="flex-none w-8" />
         </div>
-    )
-}
+
+        {/* 카드 */}
+        <div className="bg-white rounded-2xl shadow-xl ring-1 ring-gray-100 p-8">
+          <form onSubmit={handleFormSubmit} className="space-y-6">
+            {/* 이메일 */}
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                이메일
+              </label>
+              <input
+                id="email"
+                {...getInputProps("email")}
+                type="email"
+                placeholder="name@example.com"
+                className={`w-full rounded-xl border px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none transition
+                ${errors?.email && touched?.email ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-gray-300 focus:ring-2 focus:ring-gray-200"}`}
+                autoComplete="email"
+                autoFocus
+              />
+              {errors?.email && touched?.email && (
+                <p className="mt-1 text-xs text-red-500">{errors.email}</p>
+              )}
+            </div>
+
+            {/* 비밀번호 */}
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                비밀번호
+              </label>
+              <div
+                className={`relative rounded-xl border transition ${
+                  errors?.password && touched?.password
+                    ? "border-red-400 bg-red-50"
+                    : "border-gray-200 focus-within:border-gray-300 focus-within:ring-2 focus-within:ring-gray-200"
+                }`}
+              >
+                <input
+                  id="password"
+                  {...getInputProps("password")}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  className="w-full rounded-xl px-4 py-3 pr-12 text-gray-900 placeholder:text-gray-400 outline-none bg-transparent"
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute inset-y-0 right-0 pr-3 text-sm text-gray-500 hover:text-gray-700"
+                  aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
+                >
+                  {showPassword ? "숨기기" : "보기"}
+                </button>
+              </div>
+              {errors?.password && touched?.password && (
+                <p className="mt-1 text-xs text-red-500">{errors.password}</p>
+              )}
+            </div>
+
+            {/* 로그인 버튼 */}
+            <button
+              type="submit"
+              disabled={isDisabled || submitting}
+              className="w-full rounded-xl bg-gray-900 text-white py-3 text-base font-semibold
+              shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black"
+            >
+              {submitting ? "로그인 중..." : "로그인"}
+            </button>
+
+            {/* 구글 로그인 */}
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="w-full rounded-xl bg-white border border-gray-200 py-3 text-gray-900 font-medium
+              shadow-sm hover:bg-gray-50 active:bg-gray-100 transition"
+            >
+              <div className="flex items-center justify-center gap-2">
+                <img
+                  src={"/images/google.png"}
+                  alt="구글 로고"
+                  className="size-6 rounded-sm"
+                />
+                <span>Google 로그인</span>
+              </div>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default LoginPage;
