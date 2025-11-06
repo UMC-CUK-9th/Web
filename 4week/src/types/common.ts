@@ -1,23 +1,23 @@
 import { PAGINATION_ORDER } from "../enums/common";
 
+export type CommonResponse<T> = {
+    status:boolean;
+    statuscode:number;
+    message:string;
+    data:T;
+};
+
+export type CursorBasedResponse<T> = CommonResponse<{
+  data: T[];
+  nextCursor: number | null;
+  hasNext: boolean;
+}>;
+
 export type PaginationDto = {
   cursor?: number;
-  search?: string;
   limit?: number;
-  order?: PAGINATION_ORDER; 
+  search?: string;
+  order?: PAGINATION_ORDER;
+  sort?: string;
 };
-
-export type CommonResponse<T> = {
-  status: boolean;
-  statusCode: number;
-  message: string;
-  data: T;
-};
-
-export type CursorBasedResponse<T> = CommonResponse<{ 
-data: T;
-nextCursor: number | null;
-hasNext: boolean;
-  }>;
-
 

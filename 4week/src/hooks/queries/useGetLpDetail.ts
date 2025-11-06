@@ -1,8 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 // [1] (수정) default import 대신, 'getLpDetailById'를 {}로 감싸서 named import 합니다.
-import { getLpDetailById } from "../../apis/lp";
+import { getLpDetail } from "../../apis/lp";
 import { QUERY_KEY } from "../../constants/key";
-import type { Lp, ResponseLpDto } from "../../types/lp"; // [2] (수정) ResponseLpDto 타입을 임포트
+import type { Lp } from "../../types/lp";
+import type { ResponseLpDto } from "../../types/lp";
+
 
 // lpid를 인자로 받습니다.
 function useGetLpDetail(lpid: string | undefined) {
@@ -17,7 +19,7 @@ function useGetLpDetail(lpid: string | undefined) {
         throw new Error("lpid is required");
       }
       // [5] (수정) 임포트한 'getLpDetailById' 함수를 호출
-      return getLpDetailById(lpid);
+      return getLpDetail(lpid);
     },
 
     // 3. (수정) select: data.data를 반환
