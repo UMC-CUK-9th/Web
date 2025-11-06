@@ -1,38 +1,57 @@
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import useGetLpList from "../hooks/useGetLpList";
+import Lp from "../components/Lp";
 
-const HomePage = () => {
-  const navigate = useNavigate();
+function HomePage() {
+  const [search, setSearch] = useState("");
+  const [order, setOrder] = useState<"asc" | "desc">("asc");
+
+  const { data, isPending, isError } = useGetLpList({
+    search,
+    order,
+    sort: "createdAt",
+  });
+
+  if (isPending) {
+    return <div className="mt-20 text-2xl">Loading...</div>;
+  }
+
+  if (isError) {
+    return <div className="mt-20 text-2xl">Error.</div>;
+  }
+
   return (
-    <div className="min-h-screen bg-white text-gray-800">
-      <nav className="w-full bg-white shadow-sm fixed top-0 left-0 flex justify-between items-center px-6 py-3 z-10">
-        <h1
-          className="text-lg font-bold text-purple-500 cursor-pointer hover:text-purple-500 transition"
-          onClick={() => navigate("/")}
-        >
-          web
-        </h1>
-
-        <div className="flex gap-3">
+    <>
+      <div className="mt-10 p-4">
+        <div className="flex justify-end mb-4">
           <button
-            onClick={() => navigate("/login")}
-            className="px-4 py-2 text-sm rounded-lg border border-gray-300 hover:bg-gray-100 transition"
+            className={`w-20 h-8 border border-white rounded-sm ${
+              order === "asc" ? "bg-white text-black" : "bg-black text-white"
+            }`}
+            onClick={() => setOrder("asc")}
           >
-            로그인
+            오래된순
           </button>
           <button
-            onClick={() => navigate("/signup")}
-            className="px-4 py-2 text-sm rounded-lg bg-pink-600 text-black hover:bg-pink-700 transition"
+            className={`w-20 h-8 border border-white rounded-sm ${
+              order === "desc" ? "bg-white text-black" : "bg-black text-white"
+            }`}
+            onClick={() => setOrder("desc")}
           >
-            회원가입
+            최신순
           </button>
         </div>
-      </nav>
-
-      <main className="flex flex-col items-center justify-center h-screen">
-        <h2 className="text-4xl font-semibold">HOME</h2>
-      </main>
-    </div>
+        {/* <input value={search} onChange={(e) => setSearch(e.target.value)} /> */}
+        <div className="mt-10 p-4">
+          <div className="grid grid-cols-8 gap-4 justify-items-center">
+            {data?.map((lp) => (
+              <Lp key={lp.id} lp={lp} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
   );
-};
+}
 
 export default HomePage;
