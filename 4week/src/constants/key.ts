@@ -4,5 +4,7 @@ export const LOCAL_STORAGE_KEY = {
 };
 
 export const QUERY_KEY = {
-  lps: "lps",
+  lps: "lps",                // LP 목록
+  lpDetail: "lpDetail",      // LP 상세
+  lpComments: "lpComments",  // ✅ LP별 댓글
 };
