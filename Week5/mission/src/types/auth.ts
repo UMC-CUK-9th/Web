@@ -44,3 +44,5 @@ export type ResponseMyInfoDto = CommonResponse<{
   createdAt: Date;
   updateAt: Date;
 }>;
+
+export type User = ResponseMyInfoDto['data'];
