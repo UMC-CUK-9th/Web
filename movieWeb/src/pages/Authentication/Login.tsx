@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,11 +16,13 @@ const loginSchema = z.object({
   password: z.string().min(6, "비밀번호는 최소 6자 이상이어야 합니다."),
 });
 
-
 type LoginFormData = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // ✅ 보호 라우트에서 넘겨준 redirect 파라미터 (없으면 홈으로)
+  const redirectPath = searchParams.get("redirect") || "/";
 
   const { setValue: setAccessToken } = useLocalStorage<string | null>(
     LOCAL_STORAGE_KEY.accessToken,
@@ -51,24 +53,32 @@ const Login = () => {
 
       if (!result.status) throw new Error(result.message);
 
+      // ✅ 토큰 저장
       setAccessToken(result.data.accessToken);
       setRefreshToken(result.data.refreshToken);
-
       localStorage.setItem("userName", result.data.name);
 
+      // ✅ 전역 로그인 상태 감지 (Navbar/Sidebar 갱신)
       window.dispatchEvent(new Event("authChange"));
 
       alert(`${result.data.name}님, 환영합니다!`);
-      navigate("/");
+
+      // ✅ 원래 가려던 페이지로 복귀
+      navigate(redirectPath, { replace: true });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      alert(error.message || "로그인 실패");
+      alert(error?.message || "로그인 실패");
     }
   };
 
+  // ✅ 구글 로그인: redirect 파라미터 유지하여 서버로 전달
   const handleGoogleLogin = () => {
-    window.location.href =
-      import.meta.env.VITE_SERVER_API_URL + "/v1/auth/google/login";
+    const base = import.meta.env.VITE_SERVER_API_URL + "/v1/auth/google/login";
+    const url =
+      redirectPath && redirectPath !== "/"
+        ? `${base}?redirect=${encodeURIComponent(redirectPath)}`
+        : base;
+    window.location.href = url;
   };
 
   return (
