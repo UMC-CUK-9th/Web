@@ -14,7 +14,6 @@ const LpList = () => {
   const navigate = useNavigate();
   const loadMoreRef = useRef<HTMLDivElement | null>(null); // ✅ 관찰 대상 ref
 
-  // ✅ useInfiniteQuery
   const {
     data,
     isLoading,
@@ -34,7 +33,7 @@ const LpList = () => {
     gcTime: 1000 * 60 * 5,
   });
 
-  // ✅ Intersection Observer (자동 로드)
+
   useEffect(() => {
     if (!hasNextPage || isFetchingNextPage) return;
 
@@ -66,7 +65,7 @@ const LpList = () => {
       />
     );
 
-  // ✅ 모든 페이지 데이터 합치기
+  // 모든 페이지 데이터 합치기
   const lpList: LpItem[] = data?.pages.flatMap((page) => page.data) || [];
 
   return (
@@ -121,7 +120,7 @@ const LpList = () => {
         ))}
       </div>
 
-      {/* ✅ 감시용 div (IntersectionObserver target) */}
+      {/* IntersectionObserver target */}
       <div ref={loadMoreRef} className="mt-8 flex justify-center">
         {isFetchingNextPage && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 w-full">
@@ -134,7 +133,6 @@ const LpList = () => {
           </div>
         )}
       </div>
-
 
       {/* 플로팅 버튼 */}
       <FloatingButton />

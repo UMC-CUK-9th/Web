@@ -5,6 +5,7 @@ import type { LpItem } from "../../types/lp";
 import Loading from "../../components/Loading";
 import ErrorFallback from "../../components/ErrorFallBack";
 import { Heart, Edit, Trash2 } from "lucide-react";
+import LpComments from "./LpComments";
 
 const LpDetail = () => {
   const { lpid } = useParams<{ lpid: string }>();
@@ -82,6 +83,8 @@ const LpDetail = () => {
         >
           목록으로 돌아가기
         </button>
+
+        <LpComments />
       </div>
     </div>
   );
