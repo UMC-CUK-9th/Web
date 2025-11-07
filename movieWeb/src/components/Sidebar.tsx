@@ -41,11 +41,12 @@ const Sidebar = ({ isOpen, onToggle, sidebarRef, onInnerClick }: SidebarProps) =
       </div>
 
       <nav className="flex flex-col p-4 gap-3">
-        <NavLink to="/" className="hover:text-green-500">🏠 홈</NavLink>
-        <NavLink to="/popular" className="hover:text-green-500">🔥 인기 영화</NavLink>
-        <NavLink to="/now_playing" className="hover:text-green-500">🎬 상영 중</NavLink>
-        <NavLink to="/top_rated" className="hover:text-green-500">⭐ 평점 높은</NavLink>
-        <NavLink to="/upcoming" className="hover:text-green-500">⏰ 개봉 예정</NavLink>
+        <NavLink to="/" className="hover:text-green-500">홈</NavLink>
+        <NavLink to="/popular" className="hover:text-green-500">인기 영화</NavLink>
+        <NavLink to="/now_playing" className="hover:text-green-500">상영 중</NavLink>
+        <NavLink to="/top_rated" className="hover:text-green-500">평점 높은</NavLink>
+        <NavLink to="/upcoming" className="hover:text-green-500">개봉 예정</NavLink>
+        <NavLink to="/lplist" className="hover:text-green-500">LP</NavLink>
 
         <hr className="my-3" />
 
