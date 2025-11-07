@@ -35,7 +35,7 @@ const Navbar = ({ onToggleSidebar, userName, isLoggedIn }: NavbarProps) => {
       {/* 오른쪽 */}
       <div className="flex items-center gap-4">
         {isLoggedIn && userName && (
-          <span className="text-sm text-gray-600">{userName}님 반갑습니다 👋</span>
+          <span className="text-sm text-gray-600">{userName}님 반갑습니다</span>
         )}
         {isLoggedIn ? (
           <>
