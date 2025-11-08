@@ -1,70 +1,86 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext";
-import Sidebar from "./Sidebar";
-import { useEffect, useState } from "react";
 import type { ResponseMyInfoDto } from "../types/auth";
 import { getMyInfo } from "../apis/auth";
+import { useQuery } from "@tanstack/react-query";
 
-export default function Navbar() {
-  const { accessToken, logout } = useAuth();
-  const [data, setData] = useState<ResponseMyInfoDto | null>(null);
-  const navigate = useNavigate();
-
-  console.log("accessToken:", accessToken);
-  console.log("data:", data);
-
-  useEffect(() => {
-    if (!accessToken) return;
-    const fetchData = async () => {
-      try {
-        const response = await getMyInfo();
-        setData(response);
-      } catch (err) {
-        console.error("getMyInfo 실패:", err);
-      }
-    };
-    fetchData();
-  }, [accessToken]);
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/");
-  };
-
-  return (
-    <nav className="flex justify-between items-center bg-white dark:bg-gray-900 shadow-md fixed w-full z-10">
-      <div className="flex items-center justify-baseline gap-5 p-4">
-        <Sidebar />
-        <Link
-          to="/"
-          className="cursor-pointer text-2xl font-bold text-gray-900 dark:text-white"
-        >
-          돌려돌려 돌림판
-        </Link>
-      </div>
-      {accessToken ? (
-        <div className="space-x-6 mr-5 flex justify-center items-center">
-          <div className="text-white">{data?.data.name}님 환영합니다</div>
-          <button onClick={handleLogout} className="text-white">
-            로그아웃
-          </button>
-        </div>
-      ) : (
-        <div className="space-x-6 mr-5">
-          <Link
-            to="/login"
-            className="cursor-pointer text-base text-gray-900 dark:text-white"
-          >
-            로그인
-          </Link>
-          <Link
-            to="/signup"
-            className="cursor-pointer text-base text-gray-900 dark:text-white"
-          >
-            회원가입
-          </Link>
-        </div>
-      )}
-    </nav>
-  );
+interface NavbarProps {
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
+const Navbar = ({isSidebarOpen,setIsSidebarOpen}:NavbarProps) => {
+
+    
+    const { accessToken, logout } = useAuth();
+    const navigate = useNavigate();
+
+    const { data } = useQuery<ResponseMyInfoDto>({
+        queryKey: ["userInfo"],
+        queryFn: getMyInfo,
+        staleTime: 5 * 60 * 1000, 
+        gcTime: 10 * 60 * 1000, 
+        enabled : !!accessToken,
+    });
+
+    const handleLogout = async () => {
+        await logout();
+        navigate("/")
+    }
+
+    const LINKS = [
+        { to: '/login', label: '로그인' },
+        { to: '/signup', label: '회원가입' },
+    ];
+
+    return (
+       <nav className="fixed top-0 left-0 right-0 flex justify-between items-center bg-fuchsia-200 h-20 z-50 overflow-hidden">
+
+            <div className="flex items-center justify-between gap-5 ">
+                <button
+                    onClick={() => setIsSidebarOpen((prev) => !prev)} // 
+                    className="cursor-pointer p-3"
+                >
+                    <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="4"
+                        d="M7.95 11.95h32m-32 12h32m-32 12h32"
+                        />
+                    </svg>
+                </button>
+                <Link to='/' className="text-3xl font-bold text-gray-700 p-4 hover:text-black">web</Link>
+            </div>
+            {!accessToken && (
+                <div className="gap-7 mr-6 flex justify-center items-center">
+                    {LINKS.map(({ to, label }) => (
+                        <NavLink
+                            key={to}
+                            to={to}
+                            className="flex text-gray-400 font-bold cursor-pointer hover:text-black"
+                        >
+                            {label}
+                        </NavLink>
+                    ))}
+                </div>
+            )}
+            {accessToken && (
+                <div className="gap-7 mr-6 flex justify-center items-center">
+                    <div>{data?.data?.name}님 반갑습니다.</div>
+                    <button
+                        className="cursor-pointer bg-gray-300 rounded-sm p-3 hover:scale-90"
+                        onClick={handleLogout}
+                    >
+                        로그아웃
+                    </button>
+                </div>
+            )}
+
+        </nav>
+    )
+}
+
+export default Navbar

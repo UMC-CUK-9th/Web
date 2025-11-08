@@ -1,57 +1,91 @@
-import { useState } from "react";
-import useGetLpList from "../hooks/useGetLpList";
-import Lp from "../components/Lp";
+import { useEffect, useState } from "react";
+import { LoadingSpinner } from "../components/LoadingSpinner";
+import { PAGINATION_ORDER } from "../enums/common";
+import useGetInfiniteLpList from "../hooks/queries/useGetInfiniteLpList";
+import { useInView } from "react-intersection-observer";
+import LpCard from "../components/LpCard/LpCard";
+import LpCardSkeletonList from "../components/LpCard/LpCardSkeletonList";
 
-function HomePage() {
+const HomePage = () => {
   const [search, setSearch] = useState("");
-  const [order, setOrder] = useState<"asc" | "desc">("asc");
+  const [order, setOrder] = useState<PAGINATION_ORDER | null>(null);
 
-  const { data, isPending, isError } = useGetLpList({
-    search,
-    order,
-    sort: "createdAt",
-  });
+  const {
+    data: lps,
+    isFetching,
+    hasNextPage,
+    isPending,
+    fetchNextPage,
+    isError,
+  } = useGetInfiniteLpList(10, search, order ?? PAGINATION_ORDER.desc);
+
+  const { ref, inView } = useInView({ threshold: 0 });
+
+  useEffect(() => {
+    if (inView) {
+      !isFetching && hasNextPage && fetchNextPage();
+    }
+  }, [inView, isFetching, fetchNextPage]);
 
   if (isPending) {
-    return <div className="mt-20 text-2xl">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
   if (isError) {
-    return <div className="mt-20 text-2xl">Error.</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        목록을 불러올 수 없습니다.
+      </div>
+    );
   }
 
   return (
-    <>
-      <div className="mt-10 p-4">
-        <div className="flex justify-end mb-4">
-          <button
-            className={`w-20 h-8 border border-white rounded-sm ${
-              order === "asc" ? "bg-white text-black" : "bg-black text-white"
+    <div className="bg-fuchsia-100 min-h-screen w-full flex flex-col items-center overflow-x-hidden">
+      <div className="flex justify-end w-full max-w-[1600px] pt-4 pr-10 gap-2">
+        <button
+          className={`px-4 py-2 rounded-lg font-medium text-black transition-all duration-200
+            ${
+              order === PAGINATION_ORDER.asc
+                ? "bg-[#cfa9ff] scale-95"
+                : "bg-gray-200 hover:bg-gray-300"
             }`}
-            onClick={() => setOrder("asc")}
-          >
-            오래된순
-          </button>
-          <button
-            className={`w-20 h-8 border border-white rounded-sm ${
-              order === "desc" ? "bg-white text-black" : "bg-black text-white"
+          onClick={() => setOrder(PAGINATION_ORDER.asc)}
+        >
+          오래된 순
+        </button>
+
+        <button
+          className={`px-4 py-2 rounded-lg font-medium text-black transition-all duration-200
+            ${
+              order === PAGINATION_ORDER.desc
+                ? "bg-[#cfa9ff] scale-95"
+                : "bg-gray-200 hover:bg-gray-300"
             }`}
-            onClick={() => setOrder("desc")}
-          >
-            최신순
-          </button>
-        </div>
-        {/* <input value={search} onChange={(e) => setSearch(e.target.value)} /> */}
-        <div className="mt-10 p-4">
-          <div className="grid grid-cols-8 gap-4 justify-items-center">
-            {data?.map((lp) => (
-              <Lp key={lp.id} lp={lp} />
-            ))}
-          </div>
-        </div>
+          onClick={() => setOrder(PAGINATION_ORDER.desc)}
+        >
+          최신 순
+        </button>
       </div>
-    </>
+
+      {/* 카드 영역 */}
+      <div className="w-full max-w-[1600px] p-10 grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        {isFetching && <LpCardSkeletonList count={10} />}
+        {lps.pages
+          .map((page) => page.data.data)
+          ?.flat()
+          ?.map((lp) => (
+            <LpCard key={lp.id} lp={lp} />
+          ))}
+        {isFetching && <LpCardSkeletonList count={10} />}
+      </div>
+
+      <div ref={ref} className="h-2"></div>
+    </div>
   );
-}
+};
 
 export default HomePage;

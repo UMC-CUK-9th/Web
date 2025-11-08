@@ -1,18 +1,25 @@
 import { Link } from "react-router-dom";
 
-export default function Footer() {
+const Footer = () => {
   return (
-    <footer className="bg-gray-100 py-6 mt-12">
-      <div className="container mx-auto text-center text-gray-600 dark:text-gray-400">
-        <p>
-          © {new Date().getFullYear()} 돌려돌려 돌림판. All rights reserved.
-        </p>
-        <div className="flex justify-center space-x-4 mt-4">
-          <Link to={"#"}>Privacy Policy</Link>
-          <Link to={"#"}>Terms of Service</Link>
-          <Link to={"#"}>Contact</Link>
+    <footer className="bg-fuchsia-50 py-6 w-full mt-auto fixed bottom-0 left-0">
+      <div className="max-w-[1600px] mx-auto px-6 flex flex-col items-center text-gray-400 text-sm">
+        <p>&copy; {new Date().getFullYear()} Lily. All rights reserved</p>
+
+        <div className="flex justify-center gap-6 mt-3">
+          <Link to="#" className="hover:text-gray-600 transition-colors">
+            Privacy Policy
+          </Link>
+          <Link to="#" className="hover:text-gray-600 transition-colors">
+            Terms of Service
+          </Link>
+          <Link to="#" className="hover:text-gray-600 transition-colors">
+            Contact
+          </Link>
         </div>
       </div>
     </footer>
   );
-}
+};
+
+export default Footer;
