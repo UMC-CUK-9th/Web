@@ -96,7 +96,7 @@ export default function LpDetailPage() {
           <div className="flex items-center">
             <button
               className={`border border-white rounded-l-lg p-2 w-23 ${
-                sort == "asc"
+                sort === "asc"
                   ? "bg-white text-black"
                   : "bg-black text-white cursor-pointer"
               }`}
@@ -106,7 +106,7 @@ export default function LpDetailPage() {
             </button>
             <button
               className={`border border-white rounded-r-lg p-2 w-23 ${
-                sort == "desc"
+                sort === "desc"
                   ? "bg-white text-black"
                   : "bg-black text-white cursor-pointer"
               }`}

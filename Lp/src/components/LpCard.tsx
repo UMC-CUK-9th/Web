@@ -13,7 +13,11 @@ const LpCard = ({ lp }: { lp: Lp }) => {
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >
-      <img src={lp.thumbnail} className="w-full h-full object-cover" />
+      <img
+        src={lp.thumbnail}
+        alt={lp.title}
+        className="w-full h-full object-cover"
+      />
       {isHover && (
         <div className="absolute inset-0 w-full h-full p-3 bg-black/50 flex flex-col text-white backdrop-blur">
           <p className="text-sm">{lp.title}</p>

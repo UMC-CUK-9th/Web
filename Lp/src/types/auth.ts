@@ -14,8 +14,8 @@ export type ResponseSignupDto = CommonResponse<{
   email: string;
   bio: string | null;
   avatar: string | null;
-  createAt: Date;
-  updateAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }>;
 
 export type RequestSigninDto = {

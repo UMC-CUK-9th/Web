@@ -9,7 +9,7 @@ export default function CommentCard({ comment }: commentProps) {
     <div className="flex w-full items-center pt-2">
       <img
         src={comment.author.avatar}
-        alt={`[${comment.author.avatar}] lp의 이미지`}
+        alt={`${comment.author.avatar} 프로필 이미지`}
         className="rounded-full w-8 h-8"
       />
       <div className="pl-3">

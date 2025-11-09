@@ -6,7 +6,7 @@ export type Profile = {
   email: string;
   bio: string | null;
   avatar: string | null;
-  createAt: Date;
-  updateAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
 };
 export type ResponseMeDto = CommonResponse<Profile>;

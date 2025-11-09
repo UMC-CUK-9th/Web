@@ -64,7 +64,7 @@ export default function LoginPage() {
             <p className="text-red-500">{errors.password}</p>
           )}
           <button
-            className="w-full h-12 rounded-md bg-pink-500 cursor-pointer mt-5 disabled:bg-[#252525ff] disabled:curso"
+            className="w-full h-12 rounded-md bg-pink-500 cursor-pointer mt-5 disabled:bg-[#252525ff] disabled:cursor-not-allowed"
             type="submit"
             disabled={isDisabled}
           >

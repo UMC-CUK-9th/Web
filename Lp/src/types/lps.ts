@@ -13,7 +13,7 @@ export type Lp = {
   content: string;
   thumbnail: string;
   published: boolean;
-  authorld: number;
+  authorId: number;
   createdAt: string;
   updatedAt: string;
   tags: tag[];
@@ -43,8 +43,8 @@ export type author = {
   email: string;
   bio: string;
   avatar: string;
-  createAt: string;
-  updateAt: string;
+  createdAt: string;
+  updatedAt: string;
 };
 export type lpDetail = Lp & { author: author };
 

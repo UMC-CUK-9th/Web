@@ -31,7 +31,7 @@ export default function HomePage() {
       <div className="flex justify-end mt-5 mr-5">
         <button
           className={`border border-white rounded-l-lg p-2 w-23 ${
-            sort == "asc"
+            sort === "asc"
               ? "bg-white text-black"
               : "bg-black text-white cursor-pointer"
           }`}
@@ -41,7 +41,7 @@ export default function HomePage() {
         </button>
         <button
           className={`border border-white rounded-r-lg p-2 w-23 ${
-            sort == "desc"
+            sort === "desc"
               ? "bg-white text-black"
               : "bg-black text-white cursor-pointer"
           }`}
