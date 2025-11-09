@@ -8,7 +8,7 @@ const LpCard = ({ lp }: { lp: Lp }) => {
   const navigate = useNavigate();
   return (
     <div
-      className="relative aspect-square"
+      className="relative aspect-square cursor-pointer"
       onClick={() => navigate(`/lp/${lp.id}`)}
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}

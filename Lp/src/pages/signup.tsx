@@ -87,7 +87,7 @@ export default function SignUpPage() {
   const nameIsDisabled = !watchedName || !!errors.name;
 
   return (
-    <div className="flex h-[100dvh] w-full items-center justify-center bg-black text-white">
+    <div className="flex w-full items-center justify-center bg-black text-white">
       <div className="w-90 flex flex-col items-center p-3 gap-8">
         <Header title="회원가입" />
         <form

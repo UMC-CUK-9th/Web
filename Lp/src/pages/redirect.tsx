@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import { LoadingSpinner } from "../components/loadingSpinner";
+import { LoadingSpinner } from "../components/LoadingSpinner";
 
 const RedirectPage = () => {
   const { setItem: setAccessToken } = useLocalStorage("accessToken");

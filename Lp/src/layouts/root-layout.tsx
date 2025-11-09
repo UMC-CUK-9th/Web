@@ -7,9 +7,9 @@ const RootLayout = () => {
   return (
     <div className="h-dvh flex flex-col relative">
       <Navbar />
-      <div className="flex flex-1">
+      <div className="flex flex-1 min-h-0">
         <Sidebar />
-        <div className="flex flex-1">
+        <div className="flex flex-1 overflow-y-auto bg-black">
           <Outlet />
         </div>
       </div>

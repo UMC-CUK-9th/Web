@@ -1,7 +1,7 @@
 import { useEffect, type ReactNode } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { useNavigate } from "react-router-dom";
-import { LoadingSpinner } from "../components/loadingSpinner";
+import { LoadingSpinner } from "../components/LoadingSpinner";
 
 const ProtectedLayout = ({ children }: { children: ReactNode }) => {
   const { getItem } = useLocalStorage("accessToken");
@@ -18,7 +18,7 @@ const ProtectedLayout = ({ children }: { children: ReactNode }) => {
   return (
     <>
       {!accessToken && <LoadingSpinner />}
-      {accessToken && <div>{children}</div>}
+      {accessToken && <>{children}</>}
     </>
   );
 };

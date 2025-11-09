@@ -39,7 +39,7 @@ export default function LoginPage() {
     Object.values(values).some((value) => value === "");
 
   return (
-    <div className="flex h-[100dvh] w-full items-center justify-center bg-black text-white">
+    <div className="flex w-full items-center justify-center bg-black text-white">
       <div className="w-90 flex flex-col items-center p-3 gap-8">
         <Header title="로그인" />
         <GoogleButton />
