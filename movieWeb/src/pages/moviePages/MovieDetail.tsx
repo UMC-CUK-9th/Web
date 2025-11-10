@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import { useParams } from "react-router-dom";
-import Loading from "../components/Loading";
-import { fetchMovieData } from "../services/FetchMovieDetail";
-import type { MovieDetailType, PersonType, Genre } from "../types/movieDetail";
-import { useCustomFetch } from "../hooks/useCustomFetch";
+import Loading from "../../components/Loading";
+import { fetchMovieData } from "../../services/FetchMovieDetail";
+import type { MovieDetailType, PersonType, Genre } from "../../types/movieDetail";
+import { useCustomFetch } from "../../hooks/useCustomFetch";
 
 const MovieDetail = () => {
   const { movieId } = useParams();

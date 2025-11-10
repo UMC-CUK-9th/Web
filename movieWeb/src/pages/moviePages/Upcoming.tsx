@@ -1,9 +1,9 @@
 import { useState } from "react";
-import type { Movie } from "../types/movie";
-import { fetchMovies } from "../services/FetchMovies";
+import type { Movie } from "../../types/movie";
+import { fetchMovies } from "../../services/fetchMovies";
 import { Link } from "react-router-dom";
-import Loading from "../components/Loading";
-import { useCustomFetch } from "../hooks/useCustomFetch";
+import Loading from "../../components/Loading";
+import { useCustomFetch } from "../../hooks/useCustomFetch";
 
 const Upcoming = () => {
   const [page, setPage] = useState<number>(1);

@@ -1,29 +1,22 @@
 import { useState } from "react";
-import type { Movie } from "../types/movie";
-import { fetchMovies } from "../services/FetchMovies";
+import type { Movie } from "../../types/movie";
+import { fetchMovies } from "../../services/fetchMovies";
 import { Link } from "react-router-dom";
-import Loading from "../components/Loading";
-import { useCustomFetch } from "../hooks/useCustomFetch";
+import Loading from "../../components/Loading";
+import { useCustomFetch } from "../../hooks/useCustomFetch";
+import ErrorFallback from "../../components/ErrorFallBack";
 
-const TopRated = () => {
+const Popular = () => {
   const [page, setPage] = useState<number>(1);
 
   const { data: movies, isLoading, error } = useCustomFetch<Movie[]>(
-    () => fetchMovies("top_rated", page),
+    () => fetchMovies("popular", page),
     [page]
   );
 
-  if (isLoading) {
-    return <Loading />;
-  }
+  if (isLoading) return <Loading />;
+  if (error) return <ErrorFallback error={error} />;
 
-  if (error) {
-    return (
-      <div className="flex justify-center items-center mt-20 text-red-500">
-        {error}
-      </div>
-    );
-  }
 
   return (
     <div>
@@ -75,4 +68,4 @@ const TopRated = () => {
   );
 };
 
-export default TopRated;
+export default Popular;

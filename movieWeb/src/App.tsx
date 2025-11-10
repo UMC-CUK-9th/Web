@@ -2,16 +2,18 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./layout/Layout";
 import ProtectedLayout from "./layout/ProtectedLayout";
 import Home from "./pages/Home";
-import Popular from "./pages/Popular";
-import NowPlaying from "./pages/NowPlaying";
-import TopRated from "./pages/TopRated";
-import Upcoming from "./pages/Upcoming";
-import MovieDetail from "./pages/MovieDetail";
+import Popular from "./pages/moviePages/Popular";
+import NowPlaying from "./pages/moviePages/NowPlaying";
+import TopRated from "./pages/moviePages/TopRated";
+import Upcoming from "./pages/moviePages/Upcoming";
+import MovieDetail from "./pages/moviePages/MovieDetail";
 import Login from "./pages/Authentication/Login";
 import Signup from "./pages/Authentication/Signup";
 import Logout from "./pages/Authentication/Logout";
 import GoogleLoginRedirectPage from "./pages/GoogleLoginRedirectPage";
 import Mypage from "./pages/Mypage";
+import LpList from "./pages/lpPages/LpList";
+import LpDetail from "./pages/lpPages/LpDetail";
 
 function App() {
   return (
@@ -27,13 +29,12 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/logout" element={<Logout />} />
-          <Route
-            path="/v1/auth/google/callback"
-            element={<GoogleLoginRedirectPage />}
-          />
+          <Route path="/v1/auth/google/callback" element={<GoogleLoginRedirectPage />}/>
+          <Route path="/lplist" element={<LpList />} />
 
           <Route element={<ProtectedLayout />}>
             <Route path="/mypage" element={<Mypage />} />
+            <Route path="/lp/:lpid" element={<LpDetail />} />
           </Route>
         </Route>
       </Routes>
