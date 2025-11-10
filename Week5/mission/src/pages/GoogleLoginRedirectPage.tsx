@@ -21,9 +21,11 @@ const GoogleLoginRedirectPage = () => {
 
       setAccessToken(accessToken); 
       setRefreshToken(refreshToken); 
+      const redirectPath = sessionStorage.getItem("loginRedirectPath") || "/my";
+      sessionStorage.removeItem("loginRedirectPath");
 
-    
-      window.location.href = '/my';
+
+      window.location.href = redirectPath;
     }
   }, [setAccessToken, setRefreshToken]); 
   

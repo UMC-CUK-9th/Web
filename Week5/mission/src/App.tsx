@@ -8,6 +8,8 @@ import MyPage from './pages/MyPage';
 import ProtectedLayout from './layouts/ProtectedLayout';
 import RootLayout from './layouts/RootLayout';
 import GoogleLoginRedirectPage from './pages/GoogleLoginRedirectPage';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const routerConfig: RouteObject[] = [
 {
@@ -33,8 +35,20 @@ element: <RootLayout />,
 
 const router = createBrowserRouter(routerConfig);
 
-function App() {
-return <RouterProvider router={router} />;
-}
+export const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            retry: 3,
+        }
+    }
+});
 
+function App() {
+ return(
+ <QueryClientProvider client={queryClient}>
+ <RouterProvider router={router}/>
+ {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false}/> }
+ </QueryClientProvider>
+ );
+}
 export default App;

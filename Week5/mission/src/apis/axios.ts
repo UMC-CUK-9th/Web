@@ -66,7 +66,9 @@ axiosInstance.interceptors.response.use(
             localStorage.setItem(
               LOCAL_STORAGE_KEY.accessToken, 
               JSON.stringify(newAccessToken)
-            );localStorage.setItem(
+            );
+            
+            localStorage.setItem(
               LOCAL_STORAGE_KEY.refreshToken,
               JSON.stringify(newRefreshToken)
             );
