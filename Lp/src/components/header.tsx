@@ -6,6 +6,7 @@ interface HeaderProps {
 
 export default function Header({ title }: HeaderProps) {
   const navigate = useNavigate();
+
   return (
     <div className="w-full flex flex-col items-center justify-center relative text-xl gap-8">
       <button

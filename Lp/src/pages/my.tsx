@@ -13,5 +13,5 @@ export default function MyPage() {
     getData();
   }, []);
 
-  return <>{myInfo?.name}님</>;
+  return <div className="w-full h-full text-white">{myInfo?.name}님</div>;
 }

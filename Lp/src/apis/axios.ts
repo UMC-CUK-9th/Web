@@ -75,7 +75,6 @@ axiosInstance.interceptors.response.use(
           const { setItem: setRefreshToken } = useLocalStorage("refreshToken");
           setAccessToken(data.data.accessToken);
           setRefreshToken(data.data.refreshToken);
-          console.log("재발급받은 accessToken:", data.data.accessToken);
 
           //새 accessToken을 반환하여 다른 요청들이 이것을 사용할 수 있게함.
           return data.data.accessToken;
@@ -88,6 +87,7 @@ axiosInstance.interceptors.response.use(
             removeAccessToken();
             removeRefreshToken();
             console.log(error);
+            throw error;
           })
           .finally(() => {
             refreshPromise = null;
