@@ -6,9 +6,10 @@ interface LpCardSkeletonListProps {
 const LpCardSkeletonList = ({ count }: LpCardSkeletonListProps) => {
   return (
     <>
-      {new Array(count).fill(0).map((idx) => (
+      {new Array(count).fill(0).map((_, idx) => (
         <LpCardSkeleton key={idx} />
       ))}
+
     </>
   );
 };

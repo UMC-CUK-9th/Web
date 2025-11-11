@@ -3,7 +3,6 @@ import { useRef } from "react";
 
 const fetchLps = async ({ pageParam = 0, queryKey }: { pageParam?: number; queryKey: (string | undefined)[] }) => {
   const sort = queryKey[1] ?? "latest";
-  // ...fetch logic, e.g.:
   const res = await fetch(`/api/lps?sort=${sort}&cursor=${pageParam}`);
   return res.json();
 };
@@ -13,7 +12,7 @@ const SkeletonCard = () => (
 );
 
 const MainPage = () => {
-  const sort = "latest"; // or from state
+  const sort = "latest"; 
   const {
     data,
     isLoading,
