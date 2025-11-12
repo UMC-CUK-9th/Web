@@ -12,3 +12,4 @@ export const usePostLpComment = (lpId: number) => {
     },
   });
 };
+export default usePostLpComment;

@@ -1,78 +1,99 @@
-import { useParams } from 'react-router-dom';
-// import useGetLpDetail from '../hooks/queries/useGetLpDetail'; // (이 훅은 API 명세에 맞게 새로 만드셔야 합니다)
-import type { Lp } from '../types/lp';
+// src/pages/LpSearchPage.tsx
 
-// --- 임시: useGetLpDetail 훅이 없으므로, 임시 훅과 데이터를 만듭니다. ---
-// 나중에 실제 useGetLpDetail 훅을 만드신 후 이 부분은 제거해주세요.
-const useGetLpDetail = (lpId: string | undefined) => {
-  console.log("Fetching LP with ID:", lpId);
-  // Lp 타입에 맞게 'description', 'tracklist' 등이 있다고 가정합니다.
-  const dummyData: Lp | undefined = lpId ? {
-    id: parseInt(lpId, 10),
-    title: `더미 LP 제목 ${lpId}`,
-    artist: "더미 아티스트",
-    thumbnail: `https://placehold.co/600x600/333/fff?text=LP+${lpId}`,
-    description: "이곳에 LP에 대한 자세한 설명이 들어갑니다. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    releasedDate: "2024-01-01",
-    tracklist: [
-      { id: 1, title: "트랙 1" },
-      { id: 2, title: "트랙 2" },
-      { id: 3, title: "트랙 3" },
-      { id: 4, title: "트랙 4" },
-      { id: 5, title: "트랙 5" },
-    ]
-  } : undefined;
+import { useState } from "react";
+import { Search } from "lucide-react";
+import LpCardSkeletonList from "../components/LpCardSkeletonList";
 
-  return { data: dummyData, isPending: false, isError: false };
-};
-// --- 임시 코드 끝 ---
+// 임시 가짜 데이터 (기능 구현 시 실제 데이터로 대체)
+const FAKE_RESULTS = Array.from({ length: 8 }).map((_, i) => ({
+  id: i + 100,
+  title: `검색 결과 LP 제목 ${i + 1}`,
+  thumbnail: `https://picsum.photos/seed/${i + 100}/300/300`,
+  authorName: `작성자 ${i + 1}`,
+}));
 
+const LpSearchPage = () => {
+  const [keyword, setKeyword] = useState("");
+  const [isSearching, setIsSearching] = useState(false); // 검색 중 상태 (가짜)
 
-const LpDetailPage = () => {
-  const { lpId } = useParams<{ lpId: string }>(); // URL에서 :lpId 값을 가져옵니다.
+  // 검색 핸들러 (기능 없음, UI 확인용)
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!keyword.trim()) return;
 
-  // LP ID로 상세 데이터를 가져오는 훅 (API 명세에 맞게 새로 만드셔야 합니다)
-  const { data: lp, isPending, isError } = useGetLpDetail(lpId);
-
-  if (isPending) return <div>Loading...</div>;
-  if (isError) return <div>Error fetching LP details.</div>;
-  if (!lp) return <div>LP not found.</div>;
+    setIsSearching(true);
+    // 1초 뒤에 검색 완료된 척하기
+    setTimeout(() => {
+      setIsSearching(false);
+      alert(`"${keyword}" 검색 결과입니다. (실제 기능은 아직!)`);
+    }, 1000);
+  };
 
   return (
-    <div className="container mx-auto p-4 max-w-4xl">
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* LP 썸네일 */}
-        <div className="md:w-1/2">
-          <img 
-            src={lp.thumbnail} 
-            alt={lp.title} 
-            className="w-full aspect-square rounded-lg shadow-xl object-cover"
+    <div className="container mx-auto px-4 py-8 min-h-screen">
+      {/* 검색 헤더 */}
+      <div className="max-w-2xl mx-auto text-center mb-12">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
+          원하는 LP를 찾아보세요
+        </h1>
+        <form onSubmit={handleSearch} className="relative">
+          <input
+            type="text"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            placeholder="LP 제목, 태그, 작성자로 검색..."
+            className="w-full px-6 py-4 pl-14 text-lg bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-full focus:outline-none focus:border-pink-500 dark:focus:border-pink-500 transition-colors shadow-sm"
           />
-        </div>
+          <Search
+            className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400"
+            size={24}
+          />
+          <button
+            type="submit"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 px-6 py-2 bg-pink-500 text-white rounded-full font-medium hover:bg-pink-600 transition-colors"
+          >
+            검색
+          </button>
+        </form>
+      </div>
 
-        {/* LP 정보 */}
-        <div className="md:w-1/2">
-          <h1 className="text-3xl font-bold text-gray-900">{lp.title}</h1>
-          <h2 className="text-xl text-gray-700 mt-2">{lp.artist}</h2>
-          <p className="text-gray-600 mt-1">발매일: {lp.releasedDate}</p>
+      {/* 검색 결과 영역 */}
+      <div>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+          {keyword ? `"${keyword}" 검색 결과` : "인기 LP"}
+        </h2>
 
-          <p className="text-gray-800 mt-6 whitespace-pre-wrap">
-            {lp.description}
-          </p>
-
-          {/* 트랙리스트 */}
-          <div className="mt-8">
-            <h3 className="text-2xl font-semibold text-gray-900 mb-4">트랙리스트</h3>
-            <ul className="list-decimal list-inside space-y-2 text-gray-700">
-              {lp.tracklist?.map((track) => (
-                <li key={track.id}>{track.title}</li>
-              ))}
-            </ul>
+        {isSearching ? (
+          <LpCardSkeletonList count={8} />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {FAKE_RESULTS.map((lp) => (
+              // 실제 LpCard 대신 간단한 카드 UI 사용 (LpCard import해서 써도 됨)
+              <div
+                key={lp.id}
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => alert(`${lp.title} 클릭됨! (상세 이동 기능 X)`)}
+              >
+                <img
+                  src={lp.thumbnail}
+                  alt={lp.title}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-4">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1 truncate">
+                    {lp.title}
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    by {lp.authorName}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default LpDetailPage;
+export default LpSearchPage;
