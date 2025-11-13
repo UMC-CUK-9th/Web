@@ -1,5 +1,3 @@
-// src/pages/HomePage.tsx
-
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import useGetInfiniteLpList from "../hooks/useGetInfiniteLpList";
