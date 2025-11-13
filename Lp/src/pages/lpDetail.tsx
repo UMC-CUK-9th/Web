@@ -9,6 +9,7 @@ import useGetInfiniteCommentsList from "../hooks/queries/useGetInfiniteComments"
 import { useInView } from "react-intersection-observer";
 import CommentCard from "../components/Comment";
 import CommentCardSkeleton from "../components/CommentSkeleton";
+import usePostComment from "../hooks/mutations/usePostComment";
 
 export default function LpDetailPage() {
   const params = useParams();
@@ -16,6 +17,7 @@ export default function LpDetailPage() {
   const [detail, setDetail] = useState<lpDetail>();
   const [sort, setSort] = useState<"asc" | "desc">("asc");
   const { ref, inView } = useInView({ threshold: 0 });
+  const [comment, setComment] = useState("");
 
   const handleClick = () => {
     setSort((prev) => (prev === "asc" ? "desc" : "asc"));
@@ -44,6 +46,25 @@ export default function LpDetailPage() {
       fetchNextPage();
     }
   }, [inView, isFetching, hasNextPage, fetchNextPage]);
+
+  const { mutate } = usePostComment();
+  const handleAddComment = () => {
+    const CommentData = {
+      lpId: lpId,
+      content: comment,
+    };
+    console.log(CommentData);
+    mutate(CommentData, {
+      onSuccess: () => {
+        setComment("");
+        alert("등록을 성공했습니다.");
+      },
+      onError: (error) => {
+        console.error("댓글등록오류", error);
+        alert("등록에 실패했습니다");
+      },
+    });
+  };
 
   return (
     <div className="w-full bg-black flex justify-center text-white">
@@ -74,7 +95,7 @@ export default function LpDetailPage() {
         <div className="flex items-center justify-center shadow-lg shadow-black m-3 p-8 relative">
           <img
             src={detail?.thumbnail}
-            className="w-72 h-72 rounded-full animate-spin"
+            className="w-72 h-72 rounded-full animate-spin object-cover"
           />
           <div className="absolute w-8 h-8 rounded-full bg-gray-300" />
         </div>
@@ -116,13 +137,22 @@ export default function LpDetailPage() {
             </button>
           </div>
         </div>
+
+        {/*댓글 입력창*/}
         <div className="flex w-full">
           <input
             type="text"
             placeholder="댓글을 입력해주세요"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
             className="border border-gray-300 rounded-md p-2 w-full"
           />
-          <button className="w-25 mx-3 bg-gray-500 rounded-md">작성</button>
+          <button
+            className="w-25 mx-3 bg-gray-500 rounded-md"
+            onClick={handleAddComment}
+          >
+            작성
+          </button>
         </div>
 
         <div className="w-full">
@@ -138,7 +168,7 @@ export default function LpDetailPage() {
             ?.map((page) => page.data.data)
             .flat()
             .map((comment) => (
-              <CommentCard key={comment.id} comment={comment} />
+              <CommentCard key={comment.id} comment={comment} lpId={lpId} />
             ))}
           {isFetching && (
             <>

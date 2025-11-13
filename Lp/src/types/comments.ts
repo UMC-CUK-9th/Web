@@ -25,3 +25,23 @@ export type cursor = {
   nextCursor: number;
   hasNext: boolean;
 };
+
+export type RequestPostCommentDto = {
+  lpId: number;
+  content: string;
+};
+export type ResponsePostCommentDto = CommonResponse<Comment>;
+
+export type RequestPatchCommentDto = {
+  lpId: number;
+  commentId: number;
+  content: string;
+};
+export type ResponsePatchCommentDto = CommonResponse<Comment>;
+
+export type RequestDeleteCommentDto = {
+  lpId: number;
+  commentId: number;
+};
+
+export type ResponseDeleteCommentDto = CommonResponse<{ messege: string }>;

@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import Navbar from "../components/navbar";
 import Sidebar from "../components/sidebar";
 import FloatingButton from "../components/floatingButton";
+import AddLpModal from "../components/AddLpModal";
 
 const RootLayout = () => {
   return (
@@ -13,6 +14,7 @@ const RootLayout = () => {
           <Outlet />
         </div>
       </div>
+      <AddLpModal />
       <FloatingButton />
     </div>
   );
