@@ -66,3 +66,23 @@ export type Comment = {
 
 
 export type ResponseCommentDto = CursorBasedResponse<Comment>;
+
+export type ResponseLikeLpDto = CommonResponse<{
+    id:number;
+    userId:number;
+    lpId:number;
+}>
+
+export type CreateLpsDto = {
+    title : string;
+    content : string;
+    thumbnail : string | null;
+    tags : string[];
+    published: boolean;
+};
+
+export type ResponseLpCreateDto = CommonResponse<Lp>;
+
+export type UploadResponse = {
+    imageUrl : string;
+}

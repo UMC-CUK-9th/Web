@@ -40,7 +40,7 @@ const HomeLayout = () => {
         <Navbar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={toggleSidebar} />
         <div className="flex-1">
             <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar}/>
-            <main className={`pt-20 transition-all duration-300 ease-in-out${isSidebarOpen ? 'pl-[250px]' : 'pl-0'}`}>
+            <main className={`pt-20 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'pl-[250px]' : 'pl-0'}`}>
                 <Outlet />
             </main>
         </div>

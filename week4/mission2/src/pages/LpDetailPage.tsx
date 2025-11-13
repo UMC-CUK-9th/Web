@@ -18,6 +18,14 @@ const LpDetailPage = () => {
       </div>
     );
   }
+  // const {accessToken} = useAuth();
+
+  //const {data:me} = useGetMyInfo(accessToken);
+
+  //const isLiked = lp?.data.likes.some((like) => like.userId === me?.data.id);
+
+  //const {mutate : likeMutate} = usePostLike();
+  //const {mutate : dislikeMutate} = useDeleteLike();
 
   if (isError || !data) {
     return (
@@ -31,6 +39,17 @@ const LpDetailPage = () => {
     setCommentOpen(true);
     navigate(`/lp/${data.id}/comments`);
   };
+
+  const handleLikeLp = () => {
+  //      likeMutate({lpid:Number(lpid)})
+  }
+
+  const handleDisLikeLp = () => {
+  //      dislikeMutate({lpid:Number(lpid)})
+  }
+
+    // 수정, 삭제 
+  //const isAuthor = me?.data.id === lp?.data.authorId;
 
   return (
     <div className="mt-20 mx-auto border-gray-500 border-2 p-4 rounded-2xl shadow-lg bg-lime-200 w-[70%] max-h-[100vh] overflow-y-auto">
