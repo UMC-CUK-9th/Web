@@ -25,7 +25,7 @@ function useGetLplist({
   limit,
 }: PaginationDto): UseQueryResult<LpItem[], Error> {
   return useQuery({
-    queryKey: [QUERY_KEY.lps, search, order],
+    queryKey: [QUERY_KEY.lps, cursor ?? null, limit ?? null, search, order],
     queryFn: () =>
       getLpList({
         cursor,
@@ -34,7 +34,7 @@ function useGetLplist({
         limit,
       }),
     staleTime: 1000 * 60 * 5,
-    gcTime: 100 * 60 * 10,
+    gcTime: 1000 * 60 * 10,
     
 
     select: (data: ResponseLpListDto) => data.data.data, 

@@ -17,7 +17,7 @@ export type ResponseSignupDto = CommonResponse<{
   bio: string | null;
   avatar: string | null;
   createdAt: Date;
-  updateAt: Date;
+  updatedAt: Date;
 }>;
 
 
