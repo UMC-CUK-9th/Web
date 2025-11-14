@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { LpItem } from "../types/lp";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const BASE_URL = import.meta.env.VITE_SERVER_API_URL || "http://localhost:8000";
 
 export interface LpListResponse {
   data: LpItem[];

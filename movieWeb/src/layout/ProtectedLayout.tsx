@@ -17,9 +17,10 @@ const ProtectedLayout = () => {
     if (!accessToken && !alertedRef.current) {
       alertedRef.current = true; // alert 중복방지
       alert("로그인이 필요한 서비스입니다.");
-      setRedirectPath(`/login?redirect=${encodeURIComponent(location.pathname)}`);
+      const redirectTarget = `${location.pathname}${location.search}${location.hash}`;
+      setRedirectPath(`/login?redirect=${encodeURIComponent(redirectTarget)}`);
     }
-  }, [accessToken, location.pathname]);
+  }, [accessToken, location.pathname, location.search, location.hash]);
 
   if (!accessToken && redirectPath) {
     return <Navigate to={redirectPath} replace />;

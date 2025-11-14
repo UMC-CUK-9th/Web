@@ -13,6 +13,6 @@ export interface LpItem {
   updatedAt?: string;
   authorId?: number;
   published?: boolean;
-  tags?: string[];
+  tags?: Array<string | { id: number; name: string }>;
   likes?: Like[];
 }

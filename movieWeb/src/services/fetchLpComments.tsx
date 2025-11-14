@@ -1,4 +1,4 @@
-// src/services/fetchLpComments.ts
+import { getCleanToken } from "../api/authAPI";
 export interface FetchLpCommentsParams {
   lpId: string;
   pageParam?: number;
@@ -10,20 +10,17 @@ export const fetchLpComments = async ({
   pageParam = 0,
   order,
 }: FetchLpCommentsParams) => {
-  const token = localStorage.getItem("accessToken");
-if (token?.startsWith('"') && token.endsWith('"')) {
-  const fixed = token.slice(1, -1); // 따옴표 제거
-  localStorage.setItem("accessToken", fixed);
-}
 
+  const token = getCleanToken();
 
   const headers: Record<string, string> = {
     accept: "application/json",
   };
   if (token) headers.Authorization = `Bearer ${token}`;
 
+  const BASE_URL = import.meta.env.VITE_SERVER_API_URL;
   const res = await fetch(
-    `http://localhost:8000/v1/lps/${lpId}/comments?cursor=${pageParam}&limit=10&order=${order}`,
+    `${BASE_URL}/v1/lps/${lpId}/comments?cursor=${pageParam}&limit=10&order=${order}`,
     {
       headers,
     }

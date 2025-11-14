@@ -1,6 +1,6 @@
 import axiosInstance from "./axiosInstance";
 
-// ✅ 회원가입 요청 타입
+// 회원가입 요청 타입
 export interface SignupRequest {
   name: string;
   email: string;
@@ -9,7 +9,7 @@ export interface SignupRequest {
   avatar?: string;
 }
 
-// ✅ 회원가입 응답 타입
+// 회원가입 응답 타입
 export interface SignupResponse {
   status: boolean;
   statusCode: number;
@@ -24,7 +24,7 @@ export interface SignupResponse {
   };
 }
 
-// ✅ 로그인 요청/응답 타입 (optional)
+// 로그인 요청/응답 타입 
 export interface SigninRequest {
   email: string;
   password: string;
@@ -42,14 +42,24 @@ export interface SigninResponse {
   };
 }
 
-// ✅ 회원가입 API
+// 회원가입 API
 export const signup = async (body: SignupRequest): Promise<SignupResponse> => {
   const { data } = await axiosInstance.post<SignupResponse>("/auth/signup", body);
   return data;
 };
 
-// ✅ 로그인 API (추후 재사용 가능)
+// 로그인 API (추후 재사용 가능)
 export const signin = async (body: SigninRequest): Promise<SigninResponse> => {
   const { data } = await axiosInstance.post<SigninResponse>("/auth/signin", body);
   return data;
+};
+
+// 토큰
+export const getCleanToken = (): string | null => {
+  let token = localStorage.getItem("accessToken");
+  if (token?.startsWith('"') && token.endsWith('"')) {
+    token = token.slice(1, -1); //따옴표 제거
+    localStorage.setItem("accessToken", token);
+  }
+  return token;
 };

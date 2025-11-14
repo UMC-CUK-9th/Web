@@ -4,8 +4,14 @@ export const useLocalStorage = <T,>(key: string, initialValue: T) => {
   const [storedValue, setStoredValue] = useState<T>(() => {
     try {
       const item = window.localStorage.getItem(key);
-      // 🔹 JSON이 아니면 그대로 반환
-      return item ? (item as unknown as T) : initialValue;
+      // JSON 파싱 시도, 실패 시 원본 값 반환
+      if (!item) return initialValue;
+      try {
+        return JSON.parse(item) as T;
+      } catch {
+        // 파싱 실패 시 원본 문자열 반환 (순수 문자열 값인 경우)
+        return item as unknown as T;
+      }
     } catch {
       return initialValue;
     }

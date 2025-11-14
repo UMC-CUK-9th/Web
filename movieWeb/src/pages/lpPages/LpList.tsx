@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import Loading from "../../components/Loading";
-import ErrorFallback from "../../components/ErrorFallBack";
+import Loading from "../../components/common/Loading";
+import ErrorFallback from "../../components/common/ErrorFallBack";
 import { fetchLpList } from "../../services/fetchLpList";
 import type { LpItem } from "../../types/lp";
 import { Heart } from "lucide-react";
@@ -12,7 +12,7 @@ import FloatingButton from "../../components/FloatingButton";
 const LpList = () => {
   const [sort, setSort] = useState<"asc" | "desc">("desc");
   const navigate = useNavigate();
-  const loadMoreRef = useRef<HTMLDivElement | null>(null); // ✅ 관찰 대상 ref
+  const loadMoreRef = useRef<HTMLDivElement | null>(null); 
 
   const {
     data,
@@ -93,10 +93,11 @@ const LpList = () => {
       {/* 카드 목록 */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {lpList.map((item) => (
-          <div
+          <button
             key={item.id}
+            type="button"
             onClick={() => navigate(`/lp/${item.id}`)}
-            className="relative overflow-hidden rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 transition cursor-pointer aspect-square group"
+            className="relative w-full overflow-hidden rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 transition cursor-pointer aspect-square group text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-500"
           >
             <img
               src={item.thumbnail}
@@ -116,7 +117,7 @@ const LpList = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </button>
         ))}
       </div>
 
