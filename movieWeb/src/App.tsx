@@ -14,6 +14,7 @@ import GoogleLoginRedirectPage from "./pages/GoogleLoginRedirectPage";
 import Mypage from "./pages/Mypage";
 import LpList from "./pages/lpPages/LpList";
 import LpDetail from "./pages/lpPages/LpDetail";
+import EditLpDetail from "./pages/lpPages/EditLpDetail";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
           <Route element={<ProtectedLayout />}>
             <Route path="/mypage" element={<Mypage />} />
             <Route path="/lp/:lpid" element={<LpDetail />} />
+            <Route path="/lp/edit/:lpid" element={<EditLpDetail />} />
           </Route>
         </Route>
       </Routes>
