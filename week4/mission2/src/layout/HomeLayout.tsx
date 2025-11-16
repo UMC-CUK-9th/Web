@@ -1,54 +1,65 @@
-import { Outlet } from "react-router-dom"
-import Navbar from "../components/Navbar"
-import Footer from "../components/Footer"
-import Sidebar from "../components/Sidebar"
-import FloatingButton from "../components/FloatingButton"
-import { useEffect, useState } from "react"
+import { Outlet } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import Sidebar from "../components/Sidebar";
+import FloatingButton from "../components/FloatingButton";
+import { Modal } from "../components/Modal";
+import LpAdd from "../components/LpAdd";
+import { useEffect, useState } from "react";
 
 const HomeLayout = () => {
-      // 사이드 바 열림/닫힘 상태 관리
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  // ⭐ 사이드바 상태
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-    const closeSidebar = () => {
+  // ⭐ LP 추가 모달 상태
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const closeSidebar = () => setIsSidebarOpen(false);
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsSidebarOpen(true);
+      } else {
         setIsSidebarOpen(false);
-    }
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
+      }
     };
 
-    useEffect(() => {
-        const handleResize = () => {
-            
-            if (window.innerWidth >= 768) {
-                setIsSidebarOpen(true);
-            } 
-            
-            else {
-                setIsSidebarOpen(false);
-            }
-        };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [isSidebarOpen]);
 
-        // resize 이벤트 리스너 등록
-        window.addEventListener('resize', handleResize);
-        
-        // 컴포넌트가 사라질 때 리스너 제거 (메모리 누수 방지)
-        return () => window.removeEventListener('resize', handleResize);
-    }, [isSidebarOpen]); 
+  return (
+    <div className="h-dvh flex flex-col">
 
-    return (
-        <div className="h-dvh flex flex-col">
-        <Navbar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={toggleSidebar} />
-        <div className="flex-1">
-            <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar}/>
-            <main className={`pt-20 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'pl-[250px]' : 'pl-0'}`}>
-                <Outlet />
-            </main>
-        </div>
-        
-        <Footer/>
-        <FloatingButton />
-        </div>
-    )
-}
+      {/* 네비 */}
+      <Navbar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={toggleSidebar} />
 
-export default HomeLayout
+      <div className="flex-1">
+        <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+
+        <main
+          className={`pt-20 transition-all duration-300 ease-in-out ${
+            isSidebarOpen ? "pl-[250px]" : "pl-0"
+          }`}
+        >
+          <Outlet />
+        </main>
+      </div>
+
+      {/* ⭐ footer (그대로 유지) */}
+      <Footer />
+
+      {/* ⭐ 플로팅 버튼 (footer 위) */}
+      <FloatingButton onClick={() => setIsModalOpen(true)} />
+
+      {/* ⭐ LP 추가 모달은 layout에서 띄워야 안전함 */}
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <LpAdd isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      </Modal>
+    </div>
+  );
+};
+
+export default HomeLayout;

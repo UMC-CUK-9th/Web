@@ -8,22 +8,28 @@ import type { ResponseMyInfoDto } from "../../types/auth";
 function usePostLike() {
     return useMutation({
 
-       
+        // data : API 성공 응답 데이터
+        // variables : mutate에 전달한 값
+        // context : onMutate에서 반환한 값
+
         mutationFn:postLike,
 
-        
+        // onMutate : API 요청 직전에 실행
+        // UI에 바로 변경을 보여주기 위해 Cache 업데이트
+        // Optimistic Update 구현시 유용
         onMutate: async(lp) => {
-            
+            // 1. 이 게시물에 관련된 쿼리를 취소 
             await queryClient.cancelQueries({queryKey:[QUERY_KEY.lps, lp.lpid]});
         
-          
+            // 2. 현재 게시글의 데이터를 캐시헤서 가져오기
             const previousLpPost = queryClient.getQueryData<ResponseLpDetailDto>([QUERY_KEY.lps,lp.lpid]);
                     
-         
+            // 게시글 데이터를 복사해서 newLpPost 라는 새로운 객체를 만듬
+            // 오류 발생시 이전 상태로 되돌리기 위함
             const newLpPost = {...previousLpPost};
         
-            
-            //const me = queryClient.getQueryData<ResponseMyInfoDto>([QUERY_KEY.myInfo]);
+            // 게시글에 저장된 좋아요 목록에서 현재 내가 눌렀던 좋아요의 위치를 찾아야함.
+            const me = queryClient.getQueryData<ResponseMyInfoDto>([QUERY_KEY.myInfo]);
             const userId = Number(me?.data.id);
         
             // userId 기준으로 좋아요 위치 찾기
@@ -58,4 +64,4 @@ function usePostLike() {
     })
 }
 
-export default usePostLike;
+export default usePostLike

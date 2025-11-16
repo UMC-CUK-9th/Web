@@ -16,11 +16,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import LpDetailPage from "./pages/LpDetailPage";
 import CommentPage from "./pages/CommentPage";
 
-// 1. 홈페이지
-// 2. 로그인 페이지
-// 3. 회원가입 페이지
 
-// publicRoutes : 인증 없이 접근 가능한 라우트
 const publicRoutes:RouteObject[] = [
     {
         path:'/',
