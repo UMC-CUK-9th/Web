@@ -49,3 +49,24 @@ export type author = {
 export type lpDetail = Lp & { author: author };
 
 export type ResponseLpDetailDto = CommonResponse<lpDetail>;
+
+export type RequestAddLpDto = {
+  title: string;
+  content: string;
+  thumbnail?: string;
+  tags: string[];
+  published: boolean;
+};
+
+export type ResponseAddLpDto = CommonResponse<{
+  id: number;
+  title: string;
+  content: string;
+  thumbnail: string;
+  published: boolean;
+  authorId: number;
+  createdAt: string;
+  updatedAt: string;
+}>;
+
+export type ResponsePostImageDto = CommonResponse<{ imageUrl: string }>;
