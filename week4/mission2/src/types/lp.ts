@@ -1,68 +1,70 @@
-import type { CursorBasedResponse } from "./common";
+import type { CommonResponse, CursorBasedResponse } from "./common";
 
 export type Tag = {
-  id: number;
-  name: string;
-};
+    id: number;
+    name: string;
+}
 
 export type Likes = {
-  id: number;
-  userId: number;
-  lpId: number;
-};
+    id: number;
+    userId: number;
+    lpId: number;
+}
 
 export type Author = {
-  id: number;
-  name: string;
-  email: string;
-  bio: string;
-  avatar: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
+    id : number;
+    name : string;
+    email : string;
+    bio : string;
+    avatar : string;
+    createdAt : Date;
+    updatedAt : Date;
+}
 
 export type Lp = {
-  id: number;
-  title: string;
-  content: string;
-  thumbnail: string;
-  published: boolean;
-  authorId: number;
-  createdAt: Date;
-  updatedAt: Date;
-  tags: Tag[];
-  likes: Likes[];
-  author: Author;
-};
+    id: number;
+    title: string;
+    content: string;
+    thumbnail: string;
+    published: boolean;
+    authorId: number;
+    createdAt: Date;
+    updatedAt: Date;
+    tags: Tag[];
+    likes:Likes[];
+    author: Author;
+}
 
+export type RequestLpDto = {
+    lpid:number;
+}
 
 export type ResponseLpListDto = CursorBasedResponse<Lp[]>;
 
+export type ResponseLpDetailDto = CommonResponse<Lp>;
 
-export type ResponseLpDetailDto = {
-  data: Lp;
-  message: string;
-  status: boolean;
-  statusCode: number;
+
+export type ResponseLikeLpDto = CommonResponse<{
+    id:number;
+    userId:number;
+    lpId:number;
+}>
+
+export type CreateLpsDto = {
+    title : string;
+    content : string;
+    thumbnail : string | null;
+    tags : string[];
+    published: boolean;
 };
 
-export type Comment = {
-  id: number;
-  content: string;
-  lpId: number;
-  authorId: number;
-  createdAt: Date;
-  updatedAt: Date;
-  author: {
-    id: number;
-    name: string;
-    email: string;
-    bio: string | null;
-    avatar: string | null;
-    createdAt: Date;
-    updatedAt: Date;
+export type ResponseLpCreateDto = CommonResponse<Lp>;
+
+export type UploadResponse = {
+  status: boolean;
+  message: string;
+  statusCode: number;
+  data: {
+    imageUrl: string;
   };
 };
-
-
-export type ResponseCommentDto = CursorBasedResponse<Comment>;

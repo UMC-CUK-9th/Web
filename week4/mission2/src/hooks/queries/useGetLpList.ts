@@ -5,7 +5,7 @@ import { QUERY_KEY } from "../../constants/key";
 
 function useGetLpList({cursor,search,order,limit,sort}:PaginationDto){
     return useQuery({
-        queryKey:[QUERY_KEY.lps,search,order,sort],
+        queryKey: [QUERY_KEY.lps, search, order, sort, cursor, limit],
         queryFn: () => getLpList({
             cursor,
             search,
@@ -15,10 +15,10 @@ function useGetLpList({cursor,search,order,limit,sort}:PaginationDto){
         }),
 
         
-        staleTime : 5 * 60 * 1000, // 5분
+        staleTime : 5 * 60 * 1000, 
 
         
-        gcTime : 10 * 60 * 1000, // 10분
+        gcTime : 10 * 60 * 1000, 
 
         
 

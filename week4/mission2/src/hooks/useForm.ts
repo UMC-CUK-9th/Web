@@ -1,7 +1,7 @@
 import { useEffect, useState, type ChangeEvent } from "react";
 
 interface UseFormProps<T> {
-    initialValues: T, // {email: '', password: ''}
+    initialValues: T, 
 
     validate: (values: T) => Record<keyof T, string>;
 

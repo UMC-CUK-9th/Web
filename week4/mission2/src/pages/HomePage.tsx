@@ -5,10 +5,11 @@ import useGetInfiniteLpList from "../hooks/queries/useGetInfiniteLpList";
 import { useInView } from "react-intersection-observer";
 import LpCard from "../components/LpCard/LpCard";
 import LpCardSkeletonList from "../components/LpCard/LpCardSkeletonList";
+import FloatingButton from "../components/FloatingButton";
 
 const HomePage = () => {
-  const [search, setSearch] = useState("");
   const [order, setOrder] = useState<PAGINATION_ORDER | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
     data: lps,
@@ -17,7 +18,7 @@ const HomePage = () => {
     isPending,
     fetchNextPage,
     isError,
-  } = useGetInfiniteLpList(10, search, order ?? PAGINATION_ORDER.desc);
+  } = useGetInfiniteLpList(10, "", order ?? PAGINATION_ORDER.desc);
 
   const { ref, inView } = useInView({ threshold: 0 });
 
@@ -27,7 +28,7 @@ const HomePage = () => {
     }
   }, [inView, isFetching, fetchNextPage]);
 
-  if (isPending) {
+  if (isPending && !lps) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <LoadingSpinner />
@@ -44,15 +45,14 @@ const HomePage = () => {
   }
 
   return (
-    <div className="bg-fuchsia-100 min-h-screen w-full flex flex-col items-center overflow-x-hidden">
+    <div className="relative bg-fuchsia-100 min-h-screen w-full flex flex-col items-center overflow-x-hidden">
+      
+      {/* 정렬 버튼 */}
       <div className="flex justify-end w-full max-w-[1600px] pt-4 pr-10 gap-2">
         <button
           className={`px-4 py-2 rounded-lg font-medium text-black transition-all duration-200
-            ${
-              order === PAGINATION_ORDER.asc
-                ? "bg-[#cfa9ff] scale-95"
-                : "bg-gray-200 hover:bg-gray-300"
-            }`}
+            ${order === PAGINATION_ORDER.asc ? "bg-[#cfa9ff] scale-95" : "bg-gray-200 hover:bg-gray-300"}
+          `}
           onClick={() => setOrder(PAGINATION_ORDER.asc)}
         >
           오래된 순
@@ -60,30 +60,33 @@ const HomePage = () => {
 
         <button
           className={`px-4 py-2 rounded-lg font-medium text-black transition-all duration-200
-            ${
-              order === PAGINATION_ORDER.desc
-                ? "bg-[#cfa9ff] scale-95"
-                : "bg-gray-200 hover:bg-gray-300"
-            }`}
+            ${order === PAGINATION_ORDER.desc ? "bg-[#cfa9ff] scale-95" : "bg-gray-200 hover:bg-gray-300"}
+          `}
           onClick={() => setOrder(PAGINATION_ORDER.desc)}
         >
           최신 순
         </button>
       </div>
 
-      {/* 카드 영역 */}
+      {/* 카드 */}
       <div className="w-full max-w-[1600px] p-10 grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-        {isFetching && <LpCardSkeletonList count={10} />}
-        {lps.pages
-          .map((page) => page.data.data)
+        {lps?.pages
+          ?.map((page) => page?.data?.data ?? [])
           ?.flat()
           ?.map((lp) => (
             <LpCard key={lp.id} lp={lp} />
           ))}
+
         {isFetching && <LpCardSkeletonList count={10} />}
       </div>
 
       <div ref={ref} className="h-2"></div>
+
+      {/* 버튼 */}
+      <FloatingButton onClick={() => setIsModalOpen(true)} />
+
+      {/* 모달 */}
+      
     </div>
   );
 };
