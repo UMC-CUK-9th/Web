@@ -1,3 +1,5 @@
+// src/pages/LpDetailPage.tsx
+
 import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -8,9 +10,10 @@ import useDeleteLp from "../hooks/mutations/useDeleteLp";
 import useToggleLikeLp from "../hooks/mutations/useToggleLikeLp";
 import { useLpComments } from "../hooks/queries/useLpComments";
 import { usePostLpComment } from "../hooks/mutations/usePostLpComment";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react"; // Plus 아이콘 제거
+// import LpCreateModal from "../components/LpCreateModal"; // 제거
 
-// --- 아이콘들 ---
+// --- 아이콘 컴포넌트들 ---
 const EditIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
     <path
@@ -72,15 +75,14 @@ const UploaderAvatar = () => (
   </svg>
 );
 
-// --- 메인 컴포넌트 ---
 const LpDetailPage = () => {
   const { lpid } = useParams<{ lpid: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [commentContent, setCommentContent] = useState("");
+  // const [isModalOpen, setIsModalOpen] = useState(false); // 제거
 
-  // LP 상세
   const {
     data: lp,
     isPending,
@@ -89,29 +91,26 @@ const LpDetailPage = () => {
     refetch,
   } = useGetLpDetail(lpid);
 
-  // 좋아요, 삭제
   const deleteLp = useDeleteLp();
   const toggleLike = useToggleLikeLp();
 
-  // 댓글
-  const { data: comments, refetch: refetchComments } = useLpComments(Number(lpid));
+  const { data: comments, refetch: refetchComments } = useLpComments(
+    Number(lpid)
+  );
   const postComment = usePostLpComment(Number(lpid));
 
-  // 삭제 핸들러
   const handleDelete = async () => {
     if (!lpid) return;
     await deleteLp.mutateAsync(lpid);
-    navigate("/lp");
+    navigate("/");
   };
 
-  // 좋아요 핸들러
   const handleLike = async () => {
     if (!lpid) return;
     await toggleLike.mutateAsync(lpid);
     refetch();
   };
 
-  // 댓글 작성 핸들러
   const handleCommentSubmit = async () => {
     if (!commentContent.trim() || !lpid) return;
     await postComment.mutateAsync(commentContent);
@@ -119,7 +118,6 @@ const LpDetailPage = () => {
     refetchComments();
   };
 
-  // 시간 변환 함수
   const timeAgo = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -140,7 +138,7 @@ const LpDetailPage = () => {
   if (isPending) return <LoadingSpinner size="lg" />;
   if (isError)
     return (
-      <div className="container mx-auto max-w-2xl">
+      <div className="container mx-auto max-w-2xl pt-20">
         <ErrorMessage message={error.message} onRetry={() => refetch()} />
       </div>
     );
@@ -149,14 +147,15 @@ const LpDetailPage = () => {
   const isOwner = user?.id === lp.authorId;
 
   return (
-    <div className="container mx-auto max-w-3xl bg-white dark:bg-gray-800 p-4 sm:p-8 rounded-lg shadow-md">
+    // relative 제거해도 됨
+    <div className="mt-16 container mx-auto max-w-3xl bg-white dark:bg-gray-800 p-4 sm:p-8 rounded-lg shadow-md">
       {/* 헤더 */}
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-3">
           <UploaderAvatar />
           <div>
             <p className="font-semibold text-gray-900 dark:text-white">
-              {lp.authorName || "오타니안"}
+              {lp.authorName || "Unknown"}
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {timeAgo(lp.createdAt)}
@@ -164,7 +163,6 @@ const LpDetailPage = () => {
           </div>
         </div>
 
-        {/* 수정 / 삭제 버튼 */}
         {isOwner && (
           <div className="flex space-x-2">
             <button
@@ -188,7 +186,6 @@ const LpDetailPage = () => {
         {lp.title}
       </h1>
 
-      {/* CD 이미지 */}
       <div className="flex justify-center items-center my-8">
         <div className="w-64 h-64 sm:w-80 sm:h-80 relative">
           <img
@@ -200,24 +197,21 @@ const LpDetailPage = () => {
         </div>
       </div>
 
-      {/* 설명 */}
-      <div className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 mb-6">
-        <p>{lp.content}</p>
+      <div className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 mb-6 whitespace-pre-wrap">
+        {lp.content}
       </div>
 
-      {/* 태그 */}
-      <div className="mb-6">
+      <div className="mb-6 flex flex-wrap gap-2">
         {lp.tags.map((tag) => (
           <span
             key={tag.id}
-            className="inline-block bg-gray-200 dark:bg-gray-700 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 dark:text-gray-300 mr-2 mb-2"
+            className="inline-block bg-gray-200 dark:bg-gray-700 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 dark:text-gray-300"
           >
             #{tag.name}
           </span>
         ))}
       </div>
 
-      {/* 좋아요 */}
       <div className="flex items-center justify-center gap-2">
         <button
           onClick={handleLike}
@@ -228,16 +222,14 @@ const LpDetailPage = () => {
         </button>
       </div>
 
-      {/* 댓글 섹션 */}
       <div className="mt-10 border-t pt-6">
         <div className="flex items-center gap-2 mb-3">
           <MessageCircle className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
-            댓글
+            댓글 ({comments?.length || 0})
           </h2>
         </div>
 
-        {/* 댓글 목록 */}
         <div className="space-y-3 mb-4">
           {comments?.length ? (
             comments.map((comment: any) => (
@@ -245,52 +237,55 @@ const LpDetailPage = () => {
                 <p className="font-semibold text-gray-900 dark:text-gray-100">
                   {comment.userName || "익명"}
                 </p>
-                <p className="text-sm text-gray-700 dark:text-gray-300">
+                <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
                   {comment.content}
                 </p>
               </div>
             ))
           ) : (
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              아직 댓글이 없습니다.
+              아직 댓글이 없습니다. 첫 댓글을 남겨보세요!
             </p>
           )}
         </div>
 
-        {/* 댓글 작성 */}
         <div className="flex gap-2">
           <input
             value={commentContent}
             onChange={(e) => setCommentContent(e.target.value)}
-            placeholder="댓글을 입력하세요"
-            className="flex-1 px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white"
+            onKeyPress={(e) => e.key === "Enter" && handleCommentSubmit()}
+            placeholder="댓글을 입력하세요..."
+            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
           />
           <button
             onClick={handleCommentSubmit}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            disabled={!commentContent.trim()}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             등록
           </button>
         </div>
       </div>
 
-      {/* 삭제 확인 모달 */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-80">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-96">
             <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-              정말 삭제하시겠습니까?
+              게시물을 삭제하시겠습니까?
             </h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              삭제된 게시물은 복구할 수 없습니다.
+            </p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
+                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
               >
                 취소
               </button>
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
               >
                 삭제
               </button>
@@ -298,6 +293,8 @@ const LpDetailPage = () => {
           </div>
         </div>
       )}
+
+      {/* 🔥 플로팅 버튼과 모달 코드 삭제됨 (HomeLayout으로 이동) 🔥 */}
     </div>
   );
 };

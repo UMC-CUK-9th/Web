@@ -24,24 +24,25 @@ export type Lp = {
   likes: Likes[];
 };
 
-/* ✅ 댓글(Comment) 타입 추가 */
 export type Comment = {
   id: number;
   lpId: number;
   authorId: number;
-  authorName: string; // 닉네임 또는 이름
+  authorName: string; 
   content: string;
   createdAt: Date;
   updatedAt: Date;
 };
 
-/* ✅ 댓글 응답 타입 추가 (페이지네이션 고려 가능) */
+export type ResquestLpDto = {
+
+  lpid: number;
+}
+
 export type ResponseCommentListDto = CursorBasedResponse<Comment[]>;
 
-/* ✅ 기존 LP 응답 타입 */
 export type ResponseLpDto = {
-  data: Lp; // 단일 LP 상세 데이터일 때
+  data: Lp; 
 };
 
-/* ✅ LP 리스트 응답 타입 */
 export type ResponseLpListDto = CursorBasedResponse<Lp[]>;
