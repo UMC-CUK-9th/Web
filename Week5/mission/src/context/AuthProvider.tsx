@@ -91,6 +91,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         setRefreshToken(newRefreshToken);
 
         alert("로그인 성공");
+        navigate("/");
       } else {
         throw new Error("에러");
       }

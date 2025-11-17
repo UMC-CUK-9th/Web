@@ -1,12 +1,13 @@
-
-
 import { Outlet } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import { useState } from "react";
 
+
 const MainLayout = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+
 
   return (
     <div className="flex h-dvh bg-slate-50 font-sans">
@@ -16,15 +17,18 @@ const MainLayout = () => {
         onClose={() => setSidebarOpen(false)} 
       />
 
-
       <div className="flex-1 flex flex-col overflow-hidden">
         
 
         <Header onMenuClick={() => setSidebarOpen(true)} />
 
      
-        <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6 relative">
           <Outlet />
+
+    
+
+
         </main>
 
 

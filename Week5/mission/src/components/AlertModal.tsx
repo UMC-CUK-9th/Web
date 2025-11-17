@@ -1,4 +1,4 @@
-
+import { useEffect, useRef } from "react";
 
 interface AlertModalProps {
   onConfirm: () => void;
@@ -7,19 +7,46 @@ interface AlertModalProps {
   confirmText?: string;
 }
 
+
+
 const AlertModal = ({
   onConfirm,
   title = "로그인 필요",
   message = "로그인 필요",
   confirmText = "확인",
 }: AlertModalProps) => {
+
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onConfirm();
+    };
+    document.addEventListener("keydown", handleEscape);
+    dialogRef.current?.focus();
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [onConfirm]);
+
   return (
 
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      onClick={onConfirm}
+      role="presentation"
+    >
 
-      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm">
-        <h3 className="text-lg font-bold text-gray-900">{title}</h3>
-        <p className="mt-2 text-sm text-gray-600">{message}</p>
+            <div 
+        ref={dialogRef}
+        className="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        aria-describedby="modal-message"
+        tabIndex={-1}
+      >
+        <h3 id="modal-title" className="text-lg font-bold text-gray-900">{title}</h3>
+        <p id="modal-message" className="mt-2 text-sm text-gray-600">{message}</p>
         <div className="mt-6 flex justify-end">
           <button
             onClick={onConfirm}

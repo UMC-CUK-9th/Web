@@ -10,6 +10,7 @@ import RootLayout from './layouts/RootLayout';
 import GoogleLoginRedirectPage from './pages/GoogleLoginRedirectPage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import LpDetailPage from './pages/LpDetailPage';
 
 const routerConfig: RouteObject[] = [
 {
@@ -23,6 +24,7 @@ element: <RootLayout />,
 { path: "login", element: <LoginPage /> },
  { path: "signup", element: <SignUpPage /> },
  {path: "v1/auth/google/callback", element: <GoogleLoginRedirectPage/> }, 
+ {path:"lps/:lpId",element:<LpDetailPage/>},
  ],
 },
  {

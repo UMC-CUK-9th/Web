@@ -15,9 +15,13 @@ export const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
-const accessToken = JSON.parse(
-      localStorage.getItem(LOCAL_STORAGE_KEY.accessToken) || 'null'
-    );
+    const accessTokenStr = localStorage.getItem(LOCAL_STORAGE_KEY.accessToken);
+    let accessToken = null;
+    try {
+      accessToken = accessTokenStr ? JSON.parse(accessTokenStr) : null;
+    } catch {
+      localStorage.removeItem(LOCAL_STORAGE_KEY.accessToken);
+    }
 
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
@@ -49,11 +53,18 @@ axiosInstance.interceptors.response.use(
       if (!refreshPromise) {
         refreshPromise = (async () => {
           try {
-            const refreshToken = JSON.parse(
-              localStorage.getItem(LOCAL_STORAGE_KEY.refreshToken) || 'null'
-            );
+            const refreshTokenStr = localStorage.getItem(LOCAL_STORAGE_KEY.refreshToken);
+            let refreshToken = null;
+            try {
+              refreshToken = refreshTokenStr ? JSON.parse(refreshTokenStr) : null;
+            } catch {
+              localStorage.removeItem(LOCAL_STORAGE_KEY.refreshToken);
+              return Promise.reject(new Error('Invalid refresh token'));
+            }
             
-      
+            if (!refreshToken) {
+              return Promise.reject(new Error('No refresh token available'));
+            }
 
             const response = await axiosInstance.post('/v1/auth/refresh', {
               refresh: refreshToken,
