@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useParams } from "react-router-dom";
-import Loading from "../../components/Loading";
-import { fetchMovieData } from "../../services/FetchMovieDetail";
+import Loading from "../../components/common/Loading";
+import { fetchMovieData } from "../../services/fetchMovieDetail";
 import type { MovieDetailType, PersonType, Genre } from "../../types/movieDetail";
 import { useCustomFetch } from "../../hooks/useCustomFetch";
 

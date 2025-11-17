@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { Movie } from "../../types/movie";
 import { fetchMovies } from "../../services/fetchMovies";
 import { Link } from "react-router-dom";
-import Loading from "../../components/Loading";
+import Loading from "../../components/common/Loading";
 import { useCustomFetch } from "../../hooks/useCustomFetch";
 
 const Upcoming = () => {
