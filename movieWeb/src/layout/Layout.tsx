@@ -51,22 +51,28 @@ const Layout = () => {
 
     const handler = (e: MediaQueryListEvent) => {
       setIsDesktop(e.matches);
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      e.matches ? open() : close();
+      if (e.matches) {
+        open();
+      } else {
+        close();
+      }
     };
 
     // 초기 화면 크기 반영
     setIsDesktop(mql.matches);
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    mql.matches ? open() : close();
+    if (mql.matches) {
+      open();
+    } else {
+      close();
+    }
 
     mql.addEventListener("change", handler);
     return () => mql.removeEventListener("change", handler);
   }, [open, close]);
 
-  // 모바일에서 사이드바 바깥 클릭 시 닫기
+  
   const handleMainClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    if (!isDesktop && isOpen) {
+    if (isOpen) {
       const target = e.target as Node;
       if (sidebarRef.current && !sidebarRef.current.contains(target)) {
         close();
@@ -76,16 +82,14 @@ const Layout = () => {
 
   return (
     <div className="flex">
-      {/* Sidebar */}
       <Sidebar
         isOpen={isOpen}
-        onToggle={toggle}
         onClose={close}
         sidebarRef={sidebarRef}
         onInnerClick={(e) => e.stopPropagation()}
       />
 
-      {/* 모바일용 배경 오버레이 */}
+
       {!isDesktop && isOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-30"

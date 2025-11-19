@@ -5,7 +5,6 @@ import { useAuthMutations } from "../hooks/useAuthMutations";
 
 interface SidebarProps {
   isOpen: boolean;
-  onToggle: () => void;
   onClose: () => void;
   sidebarRef: RefObject<HTMLDivElement | null>;
   onInnerClick?: MouseEventHandler<HTMLDivElement>;
