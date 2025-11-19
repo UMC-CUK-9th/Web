@@ -6,11 +6,13 @@ import { useAuthMutations } from "../hooks/useAuthMutations";
 interface SidebarProps {
   isOpen: boolean;
   onToggle: () => void;
+  onClose: () => void;
   sidebarRef: RefObject<HTMLDivElement | null>;
   onInnerClick?: MouseEventHandler<HTMLDivElement>;
 }
 
-const Sidebar = ({ isOpen, onToggle, sidebarRef, onInnerClick }: SidebarProps) => {
+const Sidebar = ({ isOpen, onClose, sidebarRef, onInnerClick }: SidebarProps) => {
+
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     return !!localStorage.getItem("accessToken");
@@ -25,7 +27,7 @@ const Sidebar = ({ isOpen, onToggle, sidebarRef, onInnerClick }: SidebarProps) =
   const navigate = useNavigate();
   const { deleteAccountMutation } = useAuthMutations();
 
-  useEffect(() => {
+  useEffect(() => { //로그인상태변경 감지
     const handleAuthChange = () => {
       setIsLoggedIn(!!localStorage.getItem("accessToken"));
       setUserName(localStorage.getItem("userName"));
@@ -38,6 +40,28 @@ const Sidebar = ({ isOpen, onToggle, sidebarRef, onInnerClick }: SidebarProps) =
     };
   }, []);
 
+
+useEffect(() => {
+  const handleEsc = (e: KeyboardEvent) => {
+    if (e.key === "Escape") onClose();
+  };
+
+  window.addEventListener("keydown", handleEsc);
+  return () => window.removeEventListener("keydown", handleEsc);
+}, [onClose]);
+
+
+  useEffect(() => { //배경 스크롤 방지
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    }
+  }, [isOpen]);
+
   const handleConfirmDelete = () => {
     deleteAccountMutation.mutate(undefined, {
       onSuccess: () => {
@@ -47,7 +71,7 @@ const Sidebar = ({ isOpen, onToggle, sidebarRef, onInnerClick }: SidebarProps) =
         window.dispatchEvent(new Event("authChange"));
 
         setShowDeleteModal(false);
-        onToggle(); // 사이드바 닫기
+        onClose(); 
         alert("회원탈퇴가 완료되었습니다.");
         navigate("/login", { replace: true });
       },
@@ -69,7 +93,7 @@ const Sidebar = ({ isOpen, onToggle, sidebarRef, onInnerClick }: SidebarProps) =
           <h2 className="text-lg font-semibold text-gray-700">메뉴</h2>
           <button
             className="text-gray-500 hover:text-gray-700 text-xl"
-            onClick={onToggle}
+            onClick={onClose}
           >
             ✕
           </button>
