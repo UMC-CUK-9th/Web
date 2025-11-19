@@ -110,13 +110,13 @@ const LpCreatePage = () => {
           placeholder="LP Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full p-3 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+          className="w-full p-3 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <textarea
           placeholder="LP Content"
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="w-full p-3 bg-gray-800 rounded-lg h-24 resize-none focus:outline-none focus:ring-2 focus:ring-pink-500"
+          className="w-full p-3 bg-gray-800 rounded-lg h-24 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
         {/* 태그 입력 */}
@@ -127,12 +127,12 @@ const LpCreatePage = () => {
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), handleAddTag())}
-            className="flex-1 p-3 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+            className="flex-1 p-3 bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             type="button"
             onClick={handleAddTag}
-            className="px-4 py-2 bg-pink-600 rounded-lg hover:bg-pink-700 font-bold"
+            className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 font-bold"
           >
             Add
           </button>
@@ -161,7 +161,7 @@ const LpCreatePage = () => {
         <button
           type="submit"
           disabled={isPending}
-          className="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg font-bold text-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+          className="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg font-bold text-lg hover:opacity-90 transition-opacity disabled:opacity-50"
         >
           {isPending ? "Uploading..." : "Add LP"}
         </button>

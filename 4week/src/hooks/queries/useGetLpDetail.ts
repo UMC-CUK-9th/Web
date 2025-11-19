@@ -1,31 +1,19 @@
-import { useQuery } from "@tanstack/react-query";
-
-import { getLpDetail } from "../../apis/lp";
-import { QUERY_KEY } from "../../constants/key";
-import type { Lp } from "../../types/lp";
-import type { ResponseLpDto } from "../../types/lp";
+import { useQuery } from "@tanstack/react-query"
+import { QUERY_KEY } from "../../constants/key"
+import { getLpDetail } from "../../apis/lp"
+import type { RequestLpDto } from "../../types/lp"
 
 
+function useGetLpDetail ({lpid}:RequestLpDto) {
+    return useQuery({
+        queryKey:[QUERY_KEY.lps, lpid],
+        queryFn: () => getLpDetail({lpid}),
+        staleTime: 5 * 60 * 1000,
+        gcTime : 10 * 60 * 1000,
+        retry : 3,
+        enabled: Boolean(lpid),
 
-function useGetLpDetail(lpid: string | undefined) {
- 
-  return useQuery<ResponseLpDto, Error, Lp>({ 
-
-    queryKey: [QUERY_KEY.lp, lpid],
-
-
-    queryFn: () => {
-      if (!lpid) {
-        throw new Error("lpid is required");
-      }
-     
-      return getLpDetail(lpid);
-    },
-
-    select: (response) => response.data,
-
-    enabled: !!lpid,
-  });
+    })
 }
 
-export default useGetLpDetail;
+export default useGetLpDetail

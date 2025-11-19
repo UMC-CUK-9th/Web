@@ -1,19 +1,23 @@
 import { useMutation } from "@tanstack/react-query"
-import { deleteComments } from "../../apis/comment"
+import { patchComments } from "../../apis/comment"
 import { queryClient } from "../../App"
 import { QUERY_KEY } from "../../constants/key"
+import type { RequestCommentDto } from "../../types/comment"
 
-function useDeleteComment(lpId: number, commentId:number) {
+function usePatchComment(lpId: number, commentId:number) {
     return useMutation({
-        mutationFn:() => deleteComments({lpId, commentId}),
+        mutationFn: (content : RequestCommentDto) => patchComments(content,{lpId,commentId}),
         onSuccess : () => {
             queryClient.invalidateQueries({
             queryKey:[QUERY_KEY.lpComments,lpId],       
             })
         },
         onError : (error) => {
-            console.error("댓글 삭제 실패 : ", error)
+            console.error("댓글 수정 실패 : ", error)
         },
     })
 }
-export default useDeleteComment
+
+
+
+export default usePatchComment
