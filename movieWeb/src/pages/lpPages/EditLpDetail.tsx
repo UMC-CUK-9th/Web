@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, type ChangeEvent } from "react";
 
 import Loading from "../../components/common/Loading";
 import ErrorFallback from "../../components/common/ErrorFallBack";
@@ -61,7 +61,7 @@ const EditLpDetail = () => {
   };
 
   // 이미지 업로드
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFile(e.target.files?.[0] || null);
   };
 

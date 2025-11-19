@@ -28,7 +28,7 @@ const Login = () => {
       ? rawRedirect
       : "/";
 
-  /** 🔥 useMutation — signin */
+  /** useMutation — signin */
   const { signinMutation } = useAuthMutations();
 
   // react-hook-form
