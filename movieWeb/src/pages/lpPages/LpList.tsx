@@ -8,13 +8,16 @@ import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import FloatingButton from "../../components/FloatingButton";
 import useDebounce from "../../hooks/useDebounce";
+import useThrottle from "../../hooks/useThrottle";
 
 const LpList = () => {
   const [sort, setSort] = useState<"asc" | "desc">("desc");
   const [search, setSearch] = useState("");
+  const [loadTrigger, setLoadTrigger] = useState(0);
 
   const debouncedSearch = useDebounce(search, 300);
-
+  const throttledLoadTrigger = useThrottle(loadTrigger, 3000);
+  
   const navigate = useNavigate();
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -50,34 +53,51 @@ const LpList = () => {
   });
 
   // --- IntersectionObserver ---
-  useEffect(() => {
-    if (!hasNextPage || isFetchingNextPage) return;
+  // useEffect(() => {
+  //   if (!hasNextPage || isFetchingNextPage) return;
 
+  //   const observer = new IntersectionObserver(
+  //     (entries) => {
+  //       const [entry] = entries;
+  //       if (entry.isIntersecting) fetchNextPage();
+  //     },
+  //     { rootMargin: "200px" }
+  //   );
+
+  //   const target = loadMoreRef.current;
+  //   if (!target) return;
+
+  //   observer.observe(target);
+
+  //   return () => {
+  //     observer.unobserve(target);
+  //   };
+  // }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
-        if (entry.isIntersecting) fetchNextPage();
+        if (entry.isIntersecting) {
+          setLoadTrigger((prev) => prev + 1);
+        }
       },
       { rootMargin: "200px" }
     );
 
     const target = loadMoreRef.current;
-    if (!target) return;
-
-    observer.observe(target);
+    if (target) observer.observe(target);
 
     return () => {
-      observer.unobserve(target);
+      if (target) observer.unobserve(target);
     };
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+  }, []);
 
-useEffect(() => {
-  console.log("🟡 search:", search, Date.now());
-}, [search]);
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+    fetchNextPage();
+  }, [throttledLoadTrigger]);
 
-useEffect(() => {
-  console.log("🟢 debouncedSearch:", debouncedSearch, Date.now());
-}, [debouncedSearch]);
 
   // Loading & Error
   if (isLoading) return <Loading />;
