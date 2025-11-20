@@ -1,16 +1,16 @@
 import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "../../App";
-import { patchComment } from "../../apis/comments";
+import { deleteUsers } from "../../apis/users";
 
-function usePatchComment() {
+function useDeleteUsers() {
   return useMutation({
-    mutationFn: patchComment,
+    mutationFn: deleteUsers,
     onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: ["comment", data.data.id],
+        queryKey: ["user", data.data.id],
       });
     },
   });
 }
 
-export default usePatchComment;
+export default useDeleteUsers;

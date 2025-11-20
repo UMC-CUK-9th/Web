@@ -10,3 +10,9 @@ export type Profile = {
   updatedAt: Date;
 };
 export type ResponseMeDto = CommonResponse<Profile>;
+
+export type RequestPatchUsersDto = {
+  name: string;
+  bio?: string;
+  avatar: string;
+};

@@ -4,13 +4,17 @@ import LpCard from "../components/LpCard";
 import useGetInfiniteLpList from "../hooks/queries/useGetInfiniteLpList";
 import LpCardSkeleton from "../components/LpCardSkeleton";
 import { useInView } from "react-intersection-observer";
+import { FaSearch } from "react-icons/fa";
+import useDebounce from "../hooks/useDebounce";
+import useThrottle from "../hooks/useThrottle";
 
 export default function HomePage() {
   const [search, setSearch] = useState("");
+  const debouncedValue = useDebounce(search, 500);
   const [sort, setSort] = useState<"asc" | "desc">("asc");
   //const { data, isPending, isError } = useGetLpList({ order: sort, limit: 30 });
   const { data, isFetching, hasNextPage, isPending, fetchNextPage, isError } =
-    useGetInfiniteLpList(15, search, sort);
+    useGetInfiniteLpList(15, debouncedValue, sort);
 
   const handleClick = () => {
     setSort((prev) => (prev === "asc" ? "desc" : "asc"));
@@ -18,16 +22,28 @@ export default function HomePage() {
 
   const { ref, inView } = useInView({ threshold: 0 });
 
+  const throttleNext = useThrottle(inView, 3000);
+
   useEffect(() => {
-    if (inView && !isFetching && hasNextPage) {
-      fetchNextPage();
-    }
-  }, [inView, isFetching, hasNextPage, fetchNextPage]);
+    if (!throttleNext) return;
+    if (!hasNextPage || isFetching) return;
+    fetchNextPage();
+  }, [throttleNext, hasNextPage, isFetching, fetchNextPage]);
 
   console.log(data);
 
   return (
     <div className="w-full h-full bg-black text-white">
+      <div className="flex justify-center items-center">
+        <div className="border-b border-white text-white text-3xl flex mt-10 h-10 w-150 ">
+          <FaSearch />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="ml-2 w-full outline-none text-2xl"
+          />
+        </div>
+      </div>
       <div className="flex justify-end mt-5 mr-5">
         <button
           className={`border border-white rounded-l-lg p-2 w-23 ${

@@ -1,16 +1,16 @@
 import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "../../App";
-import { patchComment } from "../../apis/comments";
+import { patchUsers } from "../../apis/users";
 
-function usePatchComment() {
+function usePatchUsers() {
   return useMutation({
-    mutationFn: patchComment,
+    mutationFn: patchUsers,
     onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: ["comment", data.data.id],
+        queryKey: ["user", data.data.id],
       });
     },
   });
 }
 
-export default usePatchComment;
+export default usePatchUsers;

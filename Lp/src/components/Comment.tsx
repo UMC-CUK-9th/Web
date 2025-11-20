@@ -21,6 +21,10 @@ export default function CommentCard({ comment, lpId }: commentProps) {
   const { mutate: deleteMutate } = useDeleteComment();
 
   const handlePatchComment = () => {
+    if (!newComment.trim()) {
+      alert("댓글 내용을 입력해주세요.");
+      return;
+    }
     const CommentData = {
       lpId: lpId,
       commentId: comment.id,
@@ -29,6 +33,7 @@ export default function CommentCard({ comment, lpId }: commentProps) {
     patchMutate(CommentData, {
       onSuccess: () => {
         setNewComment("");
+        setIsPatch(false);
       },
       onError: (error) => {
         console.error("댓글수정오류", error);
@@ -87,6 +92,7 @@ export default function CommentCard({ comment, lpId }: commentProps) {
               <div className="absolute top-6 flex gap-3 items-center bg-black rounded-md">
                 <GoPencil
                   onClick={() => {
+                    setNewComment(comment.content);
                     setIsPatch(true);
                     setIsOpen(false);
                   }}

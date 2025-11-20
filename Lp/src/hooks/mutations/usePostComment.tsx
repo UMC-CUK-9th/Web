@@ -6,12 +6,9 @@ function usePostComment() {
   return useMutation({
     mutationFn: postComment,
     onSuccess: (data) => {
-      console.log("usePostComment 실행됨");
       queryClient.invalidateQueries({
         queryKey: ["comment", data.data.id],
-        exact: true,
       });
-      window.location.reload();
     },
   });
 }

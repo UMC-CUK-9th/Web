@@ -1,24 +1,49 @@
 import { useEffect, useState } from "react";
-import { getMe } from "../apis/auth";
+import { getMe } from "../apis/users";
 import type { Profile } from "../types/users";
 import profileImage from "../assets/profileImage.png";
 import { GoPencil } from "react-icons/go";
 import { FaCheck } from "react-icons/fa6";
+import usePatchUsers from "../hooks/mutations/usePatchUsers";
 
 export default function MyPage() {
   const [myInfo, setMyInfo] = useState<Profile>();
   const [edit, setEdit] = useState(false);
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
+  const [avatar, setAvatar] = useState("");
   useEffect(() => {
     const getData = async () => {
       const { data } = await getMe();
       setMyInfo(data);
+      setName(data.name);
+      if (data.bio) {
+        setBio(data.bio);
+      }
       console.log(data);
     };
     getData();
   }, []);
   const profileSrc = myInfo?.avatar ? myInfo.avatar : profileImage;
+
+  const { mutate } = usePatchUsers();
+
+  const handleEdit = () => {
+    const UserData = {
+      name: name,
+      bio: bio,
+      avatar: avatar,
+    };
+    mutate(UserData, {
+      onSuccess: () => {
+        alert("수정을 성공했습니다.");
+      },
+      onError: (error) => {
+        console.error("프로필 편집오류", error);
+        alert("수정에 실패했습니다");
+      },
+    });
+  };
 
   return (
     <div className="w-full h-full text-white flex flex-col items-center p-10 text-white">
@@ -43,7 +68,7 @@ export default function MyPage() {
                   onChange={(e) => setName(e.target.value)}
                   className="border w-44 text-3xl "
                 />
-                <FaCheck className="" />
+                <FaCheck onClick={() => handleEdit()} />
               </>
             )}
           </div>
