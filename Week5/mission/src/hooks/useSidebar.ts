@@ -16,10 +16,14 @@ export const useSidebar = (initialState = false) => {
 
     if (isOpen) {
       window.addEventListener('keydown', handleEsc);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
     }
 
     return () => {
       window.removeEventListener('keydown', handleEsc);
+      document.body.style.overflow = 'unset';
     };
   }, [isOpen, close]);
 

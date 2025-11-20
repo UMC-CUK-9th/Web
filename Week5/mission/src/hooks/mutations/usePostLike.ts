@@ -24,7 +24,13 @@ function usePostLike() {
                     return;
             }    
         
-                    const newLpPost = structuredClone(previousLpPost);
+                   const newLpPost = {
+        ...previousLpPost,
+        data: {
+          ...previousLpPost.data,
+          likes: [...previousLpPost.data.likes], 
+        },
+      };
         
                     const me = queryClient.getQueryData<ResponseMyInfoDto>([
                         QUERY_KEY.myInfo,
@@ -43,7 +49,11 @@ function usePostLike() {
                     );
         
                     if(likedIndex === -1){
-                        const newLike = {userId, lpId: lp.lpId};
+                        const newLike: Likes = {
+          id: Date.now(), 
+          userId,
+          lpId: lp.lpId,
+        };
                         newLpPost?.data.likes.push(newLike as Likes);
                     }
         

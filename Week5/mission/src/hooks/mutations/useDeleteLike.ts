@@ -26,7 +26,13 @@ function useDeleteLike() {
             }
     
 
-            const newLpPost = structuredClone(previousLpPost);
+            const newLpPost = {
+        ...previousLpPost,
+        data: {
+          ...previousLpPost.data,
+          likes: [...previousLpPost.data.likes],
+        },
+      };
 
             const me = queryClient.getQueryData<ResponseMyInfoDto>([
                 QUERY_KEY.myInfo,

@@ -1,14 +1,28 @@
-
-
-import useForm from "../hooks/useForm";
-import { type UserSigninInformation, validateSignin } from "../utils/validate";
-import { useNavigate, useLocation } from "react-router-dom";
-import { FaArrowLeft, FaEnvelope, FaLock } from "react-icons/fa";
-import { useAuth } from "../hooks/useAuth";
 import { useEffect } from "react";
-import { useMutation } from "@tanstack/react-query"; 
-import { postSignin } from "../apis/auth"; 
-import { isAxiosError } from "axios"; 
+import { useNavigate, useLocation } from "react-router-dom";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod"; 
+import z from "zod";
+import { FaArrowLeft, FaEnvelope, FaLock } from "react-icons/fa";
+import { useMutation } from "@tanstack/react-query";
+import { postSignin } from "../apis/auth";
+import { isAxiosError } from "axios";
+import { useAuth } from "../hooks/useAuth";
+
+
+const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: "이메일을 입력해주세요." })
+    .email({ message: "올바른 이메일 형식이 아닙니다!" }), 
+  password: z
+    .string()
+    .min(8, { message: "비밀번호는 8-20자 사이로 입력해주세요" }) 
+    .max(20, { message: "비밀번호는 8-20자 사이로 입력해주세요" }),
+});
+
+
+type LoginFormFields = z.infer<typeof loginSchema>;
 
 const LoginPage = () => {
   const { setAuthData, accessToken } = useAuth();
@@ -23,13 +37,20 @@ const LoginPage = () => {
     }
   }, [navigate, accessToken]);
 
-  const { values, error, getInputProps } = useForm<UserSigninInformation>({
-    initialValue: { email: "", password: "" },
-    validate: validateSignin,
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid, isSubmitting }, 
+  } = useForm<LoginFormFields>({
+    resolver: zodResolver(loginSchema),
+    mode: "onChange", 
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
 
-
-  const { mutate: loginMutate, isPending } = useMutation({
+  const { mutate: loginMutate } = useMutation({
     mutationFn: postSignin,
     onSuccess: (response) => {
       const { data: responseData } = response;
@@ -41,17 +62,18 @@ const LoginPage = () => {
       }
     },
     onError: (error) => {
-      console.error("로그인 페이지에서 오류 감지:", error);
+      console.error("로그인 오류:", error);
       let message = "로그인 실패. 이메일과 비밀번호를 확인해주세요.";
       if (isAxiosError(error) && error.response?.data?.message) {
-        message = error.response.data.message;
+        message = String(error.response.data.message);
       }
       alert(message);
     },
   });
 
-  const handleSubmit = async () => {
-loginMutate(values);
+
+  const onSubmit: SubmitHandler<LoginFormFields> = (data) => {
+    loginMutate(data);
   };
 
   const handleGoogleLogin = () => {
@@ -59,12 +81,6 @@ loginMutate(values);
     window.location.href =
       import.meta.env.VITE_APP_BASE_URL + "/v1/auth/google/login";
   };
-
-  const isDisabled =
-    Object.values(error || {}).some((e) => e.length > 0) ||
-    values.email === "" ||
-    values.password === "" ||
-    isPending;
 
   return (
     <div className="flex items-center justify-center w-full py-12 px-4">
@@ -78,61 +94,70 @@ loginMutate(values);
         <h2 className="text-3xl font-bold text-slate-800 mb-2">로그인</h2>
         <p className="text-slate-500 mb-8"></p>
 
-        <div className="relative w-full mb-4">
-          <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            {...getInputProps("email")}
-            className={`w-full py-3 pl-12 pr-4 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none transition border ${
-              error?.email ? "border-red-500 bg-red-50" : "border-slate-300"
-            }`}
-            type="email"
-            placeholder="이메일"
-          />
-        </div>
-        {error?.email && (
-          <div className="text-red-500 text-sm mb-4 self-start">
-            {error.email}
-          </div>
-        )}
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full">
 
-        <div className="relative w-full">
-          <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            {...getInputProps("password")}
-            className={`w-full py-3 pl-12 pr-4 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none transition border ${
-              error?.password ? "border-red-500 bg-red-50" : "border-slate-300"
-            }`}
-            type="password"
-            placeholder="비밀번호"
-          />
-        </div>
-        {error?.password && (
-          <div className="text-red-500 text-sm mt-1 self-start">
-            {error.password}
+          <div className="relative w-full mb-4">
+            <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              {...register("email")} 
+              className={`w-full py-3 pl-12 pr-4 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none transition border ${
+                errors.email ? "border-red-500 bg-red-50" : "border-slate-300"
+              }`}
+              type="email"
+              placeholder="이메일"
+            />
           </div>
-        )}
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={isDisabled}
-          className={`w-full py-3 rounded-lg text-lg font-semibold mt-8 transition-all duration-300 ${
-            isDisabled
-              ? "bg-slate-300 text-slate-500 cursor-not-allowed"
-              : "bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 transform hover:-translate-y-1 shadow-lg shadow-indigo-200"
-          }`}
-        >
-          로그인
-        </button>
+
+          {errors.email && (
+            <div className="text-red-500 text-sm mb-4 self-start">
+              {errors.email.message}
+            </div>
+          )}
+
+          <div className="relative w-full">
+            <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              {...register("password")} 
+              className={`w-full py-3 pl-12 pr-4 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none transition border ${
+                errors.password ? "border-red-500 bg-red-50" : "border-slate-300"
+              }`}
+              type="password"
+              placeholder="비밀번호"
+            />
+          </div>
+          {errors.password && (
+            <div className="text-red-500 text-sm mt-1 self-start">
+              {errors.password.message}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={!isValid || isSubmitting}
+            className={`w-full py-3 rounded-lg text-lg font-semibold mt-8 transition-all duration-300 ${
+              !isValid || isSubmitting
+                ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+                : "bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800 transform hover:-translate-y-1 shadow-lg shadow-indigo-200"
+            }`}
+          >
+            {isSubmitting ? "로그인 중..." : "로그인"}
+          </button>
+        </form>
 
         <button
           type="button"
           onClick={handleGoogleLogin}
-          className={`w-full py-3 rounded-lg text-lg font-semibold mt-8 transition-all duration-300`}
+          className="w-full py-3 rounded-lg text-lg font-medium mt-4 
+                     border border-slate-300 bg-white text-slate-700 
+                     hover:bg-slate-50 transition-all duration-300 
+                     flex items-center justify-center gap-3"
         >
-          <div className="flex items-center justify-center gap-4">
-            <img src={"/images/google.png"} alt="Google Logo img" />
-            <span> 구글 로그인</span>
-          </div>
+          <img
+            src={"/images/google.png"}
+            alt="Google"
+            className="w-6 h-6" 
+          />
+          <span>구글 로그인</span>
         </button>
       </div>
     </div>

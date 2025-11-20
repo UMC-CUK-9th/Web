@@ -24,10 +24,12 @@ function useUpdateMyInfo() {
         return;
       }
 
-      const newCacheData = structuredClone(previousMyInfo);
-      newCacheData.data = {
-        ...newCacheData.data,
-        ...newProfileData, 
+      const newCacheData = {
+        ...previousMyInfo,
+        data: {
+          ...previousMyInfo.data,
+          ...newProfileData,
+        },
       };
 
       queryClient.setQueryData([QUERY_KEY.myInfo], newCacheData);
