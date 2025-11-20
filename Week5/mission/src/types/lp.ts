@@ -1,5 +1,6 @@
 import type { CommonResponse, CursorBasedResponse } from "./common";
 
+
 export type Tag = {
     id: number;
     name: string;
@@ -40,3 +41,13 @@ export type ResponseLikeLpDto = CommonResponse<{
 }>;
 
 
+export type RequestCreateLpDto = {
+  title: string;
+  content: string;
+  thumbnail: string | null; 
+  tags: string[];   
+  published: boolean; 
+};
+
+
+export type ResponseCreateLpDto = CommonResponse<LpItem>;

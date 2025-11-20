@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { deleteLike } from "../../apis/lp";
 import { queryClient } from "../../App";
 import { QUERY_KEY } from "../../constants/key";
-import { type Likes, type ResponseLpDto } from "../../types/lp";
+import { type ResponseLpDto } from "../../types/lp";
 import { type ResponseMyInfoDto } from "../../types/auth";
 
 
@@ -21,24 +21,31 @@ function useDeleteLike() {
                     lp.lpId,
                 ]);
 
-            const newLpPost = {...previousLpPost};
+            if (!previousLpPost) {
+                return;
+            }
+    
+
+            const newLpPost = structuredClone(previousLpPost);
 
             const me = queryClient.getQueryData<ResponseMyInfoDto>([
                 QUERY_KEY.myInfo,
             ]);
 
+            if (!me?.data?.id) {
+                console.error("오류");
+                return { previousLpPost };
+            }
+
             const userId = Number(me?.data.id);
 
             const likedIndex = 
-            previousLpPost?.data.likes.findIndex(
+            newLpPost.data.likes.findIndex(
                 (like) => like.userId === userId,
-            ) ?? -1;
+            );
 
             if(likedIndex>=0){
-                previousLpPost?.data.likes.splice(likedIndex, 1);
-            }else{
-                const newLike = {userId, lpId: lp.lpId} as Likes;
-                previousLpPost?.data.likes.push(newLike);
+                newLpPost.data.likes.splice(likedIndex, 1);
             }
 
             queryClient.setQueryData([QUERY_KEY.lps, lp.lpId],newLpPost);
@@ -50,7 +57,7 @@ function useDeleteLike() {
             onError:(_err, newLp, context) => {
                 queryClient.setQueryData(
                     [QUERY_KEY.lps, newLp.lpId],
-                    context?.previousLpPost?.data.id,
+                    context?.previousLpPost,
                 );
             },
 

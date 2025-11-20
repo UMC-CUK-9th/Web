@@ -6,9 +6,12 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { FaArrowLeft, FaEnvelope, FaLock } from "react-icons/fa";
 import { useAuth } from "../hooks/useAuth";
 import { useEffect } from "react";
+import { useMutation } from "@tanstack/react-query"; 
+import { postSignin } from "../apis/auth"; 
+import { isAxiosError } from "axios"; 
 
 const LoginPage = () => {
-  const { login, accessToken } = useAuth();
+  const { setAuthData, accessToken } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -25,13 +28,30 @@ const LoginPage = () => {
     validate: validateSignin,
   });
 
+
+  const { mutate: loginMutate, isPending } = useMutation({
+    mutationFn: postSignin,
+    onSuccess: (response) => {
+      const { data: responseData } = response;
+      if (responseData) {
+        const { accessToken, refreshToken } = responseData;
+        setAuthData(accessToken, refreshToken).then(() => {
+          navigate(fromPath, { replace: true });
+        });
+      }
+    },
+    onError: (error) => {
+      console.error("로그인 페이지에서 오류 감지:", error);
+      let message = "로그인 실패. 이메일과 비밀번호를 확인해주세요.";
+      if (isAxiosError(error) && error.response?.data?.message) {
+        message = error.response.data.message;
+      }
+      alert(message);
+    },
+  });
+
   const handleSubmit = async () => {
-    try {
-      await login(values);
-      navigate(fromPath, { replace: true });
-    } catch (error) {
-      console.log("로그인 페이지에서 오류 감지 (네비게이션 중단)");
-    }
+loginMutate(values);
   };
 
   const handleGoogleLogin = () => {
@@ -43,7 +63,8 @@ const LoginPage = () => {
   const isDisabled =
     Object.values(error || {}).some((e) => e.length > 0) ||
     values.email === "" ||
-    values.password === "";
+    values.password === "" ||
+    isPending;
 
   return (
     <div className="flex items-center justify-center w-full py-12 px-4">

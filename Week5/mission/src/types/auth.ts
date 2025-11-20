@@ -42,7 +42,13 @@ export type ResponseMyInfoDto = CommonResponse<{
   bio: string | null;
   avatar: string | null;
   createdAt: Date;
-  updateAt: Date;
+  updatedAt: Date;
 }>;
 
 export type User = ResponseMyInfoDto['data'];
+
+export type RequestUpdateMyInfoDto = {
+  name?: string;
+  bio?: string | null;
+  avatar?: string | null;
+};

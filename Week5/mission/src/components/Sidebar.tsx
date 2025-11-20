@@ -1,7 +1,13 @@
 
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useOnClickOutside } from "../hooks/useOnClickOutside";
+import ConfirmModal from "./ConfirmModal"; 
+import { useDeleteAccountMutation } from "../hooks/mutations/useDeleteAccountMutation"; 
+import { LogOut, User } from "lucide-react"; 
+import { useAuth } from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+
 
 interface SidebarProps {
   isOpen: boolean;
@@ -13,6 +19,22 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const sidebarRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(sidebarRef, onClose);
 
+  const { accessToken } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false); 
+  const { mutate: deleteAccountMutate, isPending } =
+    useDeleteAccountMutation(); 
+
+    const navigate = useNavigate();
+    
+  const handleDeleteAccount = () => {
+    deleteAccountMutate();
+    setIsModalOpen(false); 
+  };
+
+const handleGoToMyPage = () => {
+    navigate("/my");
+    onClose();
+  };
   return (
     <>
 
@@ -22,12 +44,44 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
           `} 
       >
-        <div className="p-4">
-          <h2 className="text-xl font-bold">Menu</h2>
+        <div className="p-4 flex flex-col h-full">
+          <div>
+          <h2 className="text-xl font-bold mb-4">Menu</h2>
+
+          {accessToken && (
+              <button
+                onClick={handleGoToMyPage}
+                className="w-full flex items-center gap-2 p-3 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors mb-2"
+              >
+                <User size={16} />
+                <span>마이페이지</span>
+              </button>
+            )}
+
+            {accessToken && (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                disabled={isPending}
+                className="w-full flex items-center gap-2 p-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+              >
+                <LogOut size={16} />
+                <span>탈퇴하기</span>
+              </button>
+            )}
+
+          </div>
+
+          <div className="mt-auto">
+
+          </div>
 
           <button onClick={onClose} className="mt-4">
             Close
           </button>
+
+
+
+
         </div>
       </div>
       
@@ -38,6 +92,16 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           onClick={onClose} 
         /> 
       )}
+
+      <ConfirmModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleDeleteAccount}
+        isPending={isPending}
+        title="회원 탈퇴"
+        message="정말로 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+        confirmText="탈퇴하기"
+      />
 
 
     </>
