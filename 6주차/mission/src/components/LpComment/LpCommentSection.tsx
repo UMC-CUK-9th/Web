@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
-import useGetLpComments from "../hooks/useGetLpComments";
 import LpCommentForm from "./LpCommentForm.tsx";
 import CommentSkeleton from "./LpCommentSkeleton.tsx";
-import ErrorDisplay from "./ErrorDisplay.tsx";
+import useGetLpComments from "../../hooks/useGetLpComments.ts";
+import ErrorDisplay from "../ErrorDisplay.tsx";
+import LpCommentButton from "./LpCommentButton.tsx";
 
 interface Props {
   lpid: string;
@@ -35,10 +36,13 @@ const LpCommentSection = ({ lpid }: Props) => {
     return <ErrorDisplay />;
   }
 
+  const allComments =
+    comments?.pages?.map((page) => page.data.data).flat() ?? [];
+
   return (
     <div className="text-gray-300 mt-10">
       <h2 className="text-2xl font-bold mb-4 text-white">댓글</h2>
-      <LpCommentForm />
+      <LpCommentForm lpid={lpid} />
 
       <div className="flex justify-end items-center gap-2 mb-4">
         <button
@@ -64,25 +68,15 @@ const LpCommentSection = ({ lpid }: Props) => {
       </div>
 
       <ul className="space-y-4">
-        {comments?.pages
-          ?.map((page) => page.data.data)
-          ?.flat()
-          ?.map((user) => (
-            <li key={user.id} className="flex gap-3">
-              <img
-                src={user.author.avatar}
-                alt="avatar"
-                className="w-8 h-8 rounded-full bg-gray-700"
-              />
-              <div>
-                <span className="font-semibold text-white">
-                  {user.author.name || "익명"}
-                </span>
-                <p>{user.content}</p>
-              </div>
-            </li>
-          ))}
+        {allComments.map((comment) => (
+          <LpCommentButton
+            key={comment.id}
+            comment={comment}
+            lpid={lpid}
+          />
+        ))}
       </ul>
+
       <div ref={ref} className="h-10 mt-4">
         {isFetchingNextPage && <CommentSkeleton />}
       </div>

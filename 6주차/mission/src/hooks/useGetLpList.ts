@@ -16,6 +16,7 @@ function useGetLpList({ cursor, search, order, limit }: PaginationDto) {
       }),
 
     staleTime: 1000 * 60 * 5,
+
     gcTime: 1000 * 60 * 10,
   });
 }

@@ -1,18 +1,20 @@
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
+import LpModal from "../components/LpModal";
+import ConfirmModal from "../components/ConfimModal";
+import { useLogout } from "../hooks/mutations/useLogout";
 
 const HomeLayout = () => {
-  const { accessToken, user, logout } = useAuth();
-  const navigate = useNavigate();
+  const { accessToken, user } = useAuth();
+  const {mutate} = useLogout();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const handleLogout = () => {
-    logout();
-    navigate("/login");
+    mutate();
   };
-
-  const handleCloseSidebar = () => setIsSidebarOpen(false);
 
   return (
     <div className="flex flex-col h-screen bg-white">
@@ -93,21 +95,20 @@ const HomeLayout = () => {
             <nav className="flex flex-col space-y-5 mt-7 ml-3 font-semibold">
               <Link
                 to={"/"}
-                onClick={handleCloseSidebar}
                 className="hover:text-blue-500 transition-all duration-200 text-gray-700"
               >
                 찾기
               </Link>
               <Link
                 to={"/my"}
-                onClick={handleCloseSidebar}
                 className="hover:text-blue-500 transition-all duration-200 text-gray-700"
               >
                 마이페이지
               </Link>
             </nav>
           </div>
-          <Link to={"/"} onClick={handleCloseSidebar} className="ml-3 text-gray-400 hover:text-red-400">
+          <Link to={"/"}
+          className="ml-3 text-gray-400 hover:text-red-400">
             탈퇴하기
           </Link>
         </aside>
@@ -122,16 +123,20 @@ const HomeLayout = () => {
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/30 z-40 md:hidden"
-          onClick={handleCloseSidebar}
+          onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* 플로팅 + 버튼 */}
       <div className="fixed bottom-8 right-8 z-30">
-        <button className="bg-blue-500 hover:bg-blue-400 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg cursor-pointer">
+        <button className="bg-blue-500 hover:bg-blue-400 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg cursor-pointer"
+        onClick={() => setIsModalOpen(true)}>
           <span className="text-3xl font-light pb-1">+</span>
         </button>
       </div>
+
+       <LpModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}/>
+       <ConfirmModal isOpen={isConfirmModalOpen} onClose={() => setIsConfirmModalOpen(false)}/>
     </div>
   );
 };

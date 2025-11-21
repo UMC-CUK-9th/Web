@@ -62,13 +62,21 @@ const SignupPage = () => {
       alert("회원가입이 완료되었습니다.");
       console.log(response);
       navigate("/");
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error) {
+      let message = "에러가 발생했습니다.";
+
+      if (error instanceof Error) {
+        message = error.message;
+      }
+
+      alert(message);
     }
   };
 
-  const next = () => setStep((prev) => (prev < 3 ? ((prev + 1) as 1 | 2 | 3) : prev));
-  const prev = () => setStep((prev) => (prev > 1 ? ((prev - 1) as 1 | 2 | 3) : prev));
+  const next = () =>
+    setStep((prev) => (prev < 3 ? ((prev + 1) as 1 | 2 | 3) : prev));
+  const prev = () =>
+    setStep((prev) => (prev > 1 ? ((prev - 1) as 1 | 2 | 3) : prev));
 
   return (
     <div className="min-h-screen w-full bg-gray-50 flex items-center justify-center px-4">
@@ -90,7 +98,10 @@ const SignupPage = () => {
           {step === 1 && (
             <div className="space-y-6">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   이메일
                 </label>
                 <input
@@ -99,12 +110,18 @@ const SignupPage = () => {
                   type="email"
                   placeholder="name@example.com"
                   className={`w-full rounded-xl border px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none transition
-                  ${errors.email ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-gray-300 focus:ring-2 focus:ring-gray-200"}`}
+                  ${
+                    errors.email
+                      ? "border-red-400 bg-red-50"
+                      : "border-gray-200 focus:border-gray-300 focus:ring-2 focus:ring-gray-200"
+                  }`}
                   autoComplete="email"
                   autoFocus
                 />
                 {errors.email && (
-                  <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>
+                  <p className="mt-1 text-xs text-red-500">
+                    {errors.email.message}
+                  </p>
                 )}
               </div>
 
@@ -132,7 +149,10 @@ const SignupPage = () => {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   비밀번호
                 </label>
                 <div
@@ -159,7 +179,9 @@ const SignupPage = () => {
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>
+                  <p className="mt-1 text-xs text-red-500">
+                    {errors.password.message}
+                  </p>
                 )}
               </div>
 
@@ -193,7 +215,9 @@ const SignupPage = () => {
                   </button>
                 </div>
                 {errors.passwordCheck && (
-                  <p className="mt-1 text-xs text-red-500">{errors.passwordCheck.message}</p>
+                  <p className="mt-1 text-xs text-red-500">
+                    {errors.passwordCheck.message}
+                  </p>
                 )}
               </div>
 
@@ -230,13 +254,14 @@ const SignupPage = () => {
               <div className="flex flex-col items-center gap-3">
                 <img
                   className="object-cover rounded-full w-28 h-28 border border-gray-200"
-                  alt="프로필"
-                  src="/images/default-avatar.png"
-                />
+                  alt="프로필"/>
               </div>
 
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   이름
                 </label>
                 <input
@@ -245,10 +270,16 @@ const SignupPage = () => {
                   type="text"
                   placeholder="이름을 입력하세요"
                   className={`w-full rounded-xl border px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none transition
-                  ${errors.name ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-gray-300 focus:ring-2 focus:ring-gray-200"}`}
+                  ${
+                    errors.name
+                      ? "border-red-400 bg-red-50"
+                      : "border-gray-200 focus:border-gray-300 focus:ring-2 focus:ring-gray-200"
+                  }`}
                 />
                 {errors.name && (
-                  <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>
+                  <p className="mt-1 text-xs text-red-500">
+                    {errors.name.message}
+                  </p>
                 )}
               </div>
 

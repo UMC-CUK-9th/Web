@@ -1,50 +1,51 @@
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import useForm from "../hooks/useForm";
 import { type UserSigninInformatin, validateSignin } from "../utils/validate";
 import MovePage from "../pages/MovePage";
-import { useEffect, useState } from "react";
+import { useLogin } from "../hooks/mutations/useLogin";
 
 const LoginPage = () => {
-  const { login, accessToken } = useAuth();
   const navigate = useNavigate();
+
+  // ✅ 토큰 상태는 AuthContext에서 가져와서 로그인되어 있으면 리다이렉트
+  const { accessToken } = useAuth();
+
+  // ✅ 로그인 요청은 useLogin 훅으로 (1번째 코드의 로직)
+  const {
+    mutate: loginMutate,
+    isPending,
+    authError,
+  } = useLogin();
+
   const [showPassword, setShowPassword] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (accessToken) navigate("/");
   }, [navigate, accessToken]);
 
-  const { values, error, touch, getInputProps } = useForm<UserSigninInformatin>(
-    {
+  const { values, error, touch, getInputProps } =
+    useForm<UserSigninInformatin>({
       initialValue: { email: "", password: "" },
       validate: validateSignin,
-    }
-  );
+    });
 
-  const handleSubmit = async () => {
-    setSubmitting(true);
-    try {
-      await login(values);
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  const isDisabled =
+    Object.values(error || {}).some((e) => e.length > 0) ||
+    Object.values(values).some((v) => v === "");
 
-  const handleFormSubmit = async (e: React.FormEvent) => {
+  const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (isDisabled || submitting) return;
-    await handleSubmit();
+    if (isDisabled || isPending) return;
+    // ✅ 1번째 코드의 loginMutate 사용
+    loginMutate(values);
   };
 
   const handleGoogleLogin = () => {
     window.location.href =
       import.meta.env.VITE_SERVER_API_URL + `/v1/auth/google/login`;
   };
-
-  const isDisabled =
-    Object.values(error || {}).some((e) => e.length > 0) ||
-    Object.values(values).some((v) => v === "");
 
   return (
     <div className="min-h-screen w-full bg-gray-50 flex items-center justify-center px-4">
@@ -77,7 +78,11 @@ const LoginPage = () => {
                 type="email"
                 placeholder="name@example.com"
                 className={`w-full rounded-xl border px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none transition
-                ${error?.email && touch?.email ? "border-red-400 bg-red-50" : "border-gray-200 focus:border-gray-300 focus:ring-2 focus:ring-gray-200"}`}
+                ${
+                  error?.email && touch?.email
+                    ? "border-red-400 bg-red-50"
+                    : "border-gray-200 focus:border-gray-300 focus:ring-2 focus:ring-gray-200"
+                }`}
                 autoComplete="email"
                 autoFocus
               />
@@ -123,14 +128,19 @@ const LoginPage = () => {
               )}
             </div>
 
+            {/* 서버 인증 에러 표시 (1번째 코드에서 가져옴) */}
+            {authError && (
+              <p className="text-xs text-red-500 text-center">{authError}</p>
+            )}
+
             {/* 로그인 버튼 */}
             <button
               type="submit"
-              disabled={isDisabled || submitting}
+              disabled={isDisabled || isPending}
               className="w-full rounded-xl bg-gray-900 text-white py-3 text-base font-semibold
               shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed hover:bg-black"
             >
-              {submitting ? "로그인 중..." : "로그인"}
+              {isPending ? "로그인 중..." : "로그인"}
             </button>
 
             {/* 구글 로그인 */}

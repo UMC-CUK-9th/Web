@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from "react";
+import { useThrottle } from "../hooks/useThrottle";
 import { Link } from "react-router-dom";
 import useGetInfiniteLpList from "../hooks/useGetInfiniteLpList";
-import LpCardSkeletonList from "../components/LpCardSkeletonList";
+import LpCardSkeletonList from "../components/LpCard/LpCardSkeletonList";
 import ErrorDisplay from "../components/ErrorDisplay";
+import { useDebounce } from "../hooks/useDebounced";
 
 const HomePage = () => {
-  const [order, setOrder] = useState<"asc" | "desc">("asc");
 
+  const [order, setOrder] = useState<"asc" | "desc">("asc");
+  const [search, setSearch] = useState("");
+  const debouncedQuery = useDebounce(search, 300);
   const limit = 20;
-  const search = "";
 
   const {
     data,
@@ -17,16 +20,25 @@ const HomePage = () => {
     isFetchingNextPage,
     fetchNextPage,
     hasNextPage,
-  } = useGetInfiniteLpList(limit, search, order);
+  } = useGetInfiniteLpList({
+    limit,
+    search: debouncedQuery,
+    order,
+    enabled: debouncedQuery.trim() !== "",
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60,
+  });
 
   // 백엔드 응답 구조: lastPage.data.data 가 LP 배열이라고 가정
-  const lpList =
-    data?.pages.flatMap((page) => page.data.data ?? []) ?? [];
-
+ const lpList =
+  data?.pages?.flatMap((page) => {
+    const arr = page?.data?.data;
+    return Array.isArray(arr) ? arr : [];
+  }) ?? [];
   // 무한 스크롤용 sentinel
   const observerRef = useRef<HTMLDivElement | null>(null);
 
-  // 🔥 IntersectionObserver로 무한 스크롤 구현
+  // IntersectionObserver로 무한 스크롤 구현 (기존 유지)
   useEffect(() => {
     const target = observerRef.current;
     if (!target) return;
@@ -34,59 +46,92 @@ const HomePage = () => {
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-
         if (
-          entry.isIntersecting && // sentinel이 화면에 보이고
-          hasNextPage && // 다음 페이지가 있고
-          !isFetchingNextPage && // 이미 다음 페이지 불러오는 중이 아니고
-          !isLoading // 첫 로딩 중도 아니면
+          entry.isIntersecting &&
+          hasNextPage &&
+          !isFetchingNextPage &&
+          !isLoading
         ) {
           fetchNextPage();
         }
       },
       {
         root: null,
-        rootMargin: "0px 0px 200px 0px", // 밑에서 200px 남았을 때 미리 불러오기
+        rootMargin: "0px 0px 200px 0px",
         threshold: 0,
       }
     );
-
     observer.observe(target);
-
     return () => {
       observer.disconnect();
     };
   }, [hasNextPage, isFetchingNextPage, isLoading, fetchNextPage]);
 
+  // window scroll 이벤트도 throttle로 제어 (성능 최적화)
+  const throttledFetchNextPage = useThrottle(() => {
+    if (
+      hasNextPage &&
+      !isFetchingNextPage &&
+      !isLoading
+    ) {
+      fetchNextPage();
+    }
+  }, 500); // 500ms마다 한 번만 실행
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // 스크롤이 하단 200px 이내로 내려오면
+      if (
+        window.innerHeight + window.scrollY >=
+        document.body.offsetHeight - 200
+      ) {
+        throttledFetchNextPage();
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [throttledFetchNextPage, hasNextPage, isFetchingNextPage, isLoading, fetchNextPage]);
+
   if (isError) {
     return <ErrorDisplay />;
   }
 
+
   return (
     <div className="p-8">
-      {/* 정렬 버튼 */}
-      <div className="flex justify-end items-center mb-4 ">
-        <button
-          onClick={() => setOrder("asc")}
-          className={`px-3 py-1 rounded-md text-sm font-semibold cursor-pointer transition-colors duration-200 ${
-            order === "asc"
-              ? `bg-gray-700 text-white`
-              : `bg-gray-200 text-gray-700`
-          }`}
-        >
-          오래된순
-        </button>
-
-        <button
-          onClick={() => setOrder("desc")}
-          className={`ml-2 px-3 py-1 rounded-md text-sm font-semibold cursor-pointer transition-colors duration-200 ${
-            order === "desc"
-              ? `bg-gray-700 text-white`
-              : `bg-gray-200 text-gray-700`
-          }`}
-        >
-          최신순
-        </button>
+      {/* 검색 입력 */}
+      <div className="flex justify-between items-center mb-4 ">
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="LP 검색어를 입력하세요"
+          className="w-64 p-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+        <div>
+          <button
+            onClick={() => setOrder("asc")}
+            className={`px-3 py-1 rounded-md text-sm font-semibold cursor-pointer transition-colors duration-200 ${
+              order === "asc"
+                ? `bg-gray-700 text-white`
+                : `bg-gray-200 text-gray-700`
+            }`}
+          >
+            오래된순
+          </button>
+          <button
+            onClick={() => setOrder("desc")}
+            className={`ml-2 px-3 py-1 rounded-md text-sm font-semibold cursor-pointer transition-colors duration-200 ${
+              order === "desc"
+                ? `bg-gray-700 text-white`
+                : `bg-gray-200 text-gray-700`
+            }`}
+          >
+            최신순
+          </button>
+        </div>
       </div>
 
       {/* ⬆️ 초기 로딩 스켈레톤 */}

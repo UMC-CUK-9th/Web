@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { Lp } from "../types/lp";
+import type { Lp } from "../../types/lp";
 
 interface LpCardProps {
   lp: Lp;
@@ -20,7 +20,6 @@ const LpCard = ({ lp }: LpCardProps) => {
             flex flex-col justify-center text-center text-white bg-black/70 scale-110 rounded-lg"
       >
         <h3 className="font-bold text-lg mb-1">{lp.title}</h3>
-        <p>{lp.createdAt.toLocaleDateString()}</p>
         <p>{lp.likes.length}</p>
       </div>
     </Link>

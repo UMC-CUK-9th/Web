@@ -19,6 +19,7 @@ interface AuthContextType {
   login: (signInData: RequestSigninDto) => Promise<boolean>;
   logout: () => Promise<void>;
   setAuthTokens: (accessToken: string, refreshToken: string | null) => void;
+  setUser?: (user: User | null) => void;
 }
 
 export const AuthContext = createContext<AuthContextType>({
@@ -127,7 +128,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
   return (
     <AuthContext.Provider
-      value={{ accessToken, refreshToken, login, logout, setAuthTokens, user }}
+      value={{ accessToken, refreshToken, login, logout, setAuthTokens, user, setUser }}
     >
       {children}
     </AuthContext.Provider>
