@@ -105,7 +105,7 @@ React 생태계와 Modern JavaScript 기술 스택을 깊이 있게 학습하고
 | 🎨 스타일링 | **Tailwind CSS** | 빠르고 일관된 Utility-first 스타일링 |
 | 🔗 상태/데이터 | **TanStack Query, Context API, useReducer** | 서버 상태 + 전역 상태 관리 |
 | 🧭 라우팅 | **React Router DOM** | SPA 라우팅 및 네비게이션 처리 |
-| 🛠️ 도구 | **Vite, ESLint, Prettier** | 빠른 빌드 환경 및 코드 품질/포맷팅 관리 |
+| 🛠️ 도구 | **Vite, ESLint, React Query Devtools, Zod** | 빠른 빌드 환경 및 코드 품질/포맷팅 관리 |
 
 </div>
 
