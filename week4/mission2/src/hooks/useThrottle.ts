@@ -1,40 +1,56 @@
 import { useEffect, useRef, useState } from "react";
 
-function useThrottle<T>(value:T,delay = 500):T {
-    // 1. 상태 변수 : throttleValue : 최종적으로 쓰로틀링이 적용된 값
-    // 초기값 : 전달받은 value
-    const [throttleValue,setThrottleValue] = useState<T>(value);
+function useThrottle<T>(value: T, delay = 500): T {
+    // 최종적으로 외부에 반환되는 쓰로틀된 값
+    const [throttleValue, setThrottleValue] = useState<T>(value);
 
-    // 2. Ref lastExcuted : 마지막으로 실행된 시간을 기록하는 변수
-    // state : 리렌더링시 값이 변경됨
-    // useRef 사용하면 컴포넌트가 리렌더링 되어도 값이 유지되고 변경되어도 리렌더링을 트리거 하지 않음
+    // 마지막으로 실행된 시각 (ms). 0으로 초기화하여 첫 호출은 즉시 실행되게 함
+    const lastExecuted = useRef<number>(0);
 
-    const lastExcuted : React.RefObject<number> = useRef<number>(Date.now());
-    
-    //  3. useEffect : value, delay가 변경될 때 아래 로직 실행.
+    // 타이머 id를 보관 (cleanup 시 사용)
+    const timerId = useRef<ReturnType<typeof setTimeout> | null>(null);
+
     useEffect(() => {
-        // 현재 시각과 lastExcuted.current에 저장된 마지막 시각 + delay 을 비교
-        // 충분한 시간이 지나면 바로 업데이트
-        if(Date.now() >= lastExcuted.current + delay){
-            // 현재 시간이 지난 경우
-            // 현재 시각으로 lastExcuted 업데이트
-            lastExcuted.current = Date.now();
-            // 최신 value를 throttleValue에 저장해서 컴포넌트 리렌더링
+        const now = Date.now();
+
+        // 첫 호출 또는 충분한 시간이 지났으면 즉시 업데이트 (leading)
+        if (lastExecuted.current === 0 || now >= lastExecuted.current + delay) {
+            lastExecuted.current = now;
             setThrottleValue(value);
-        } else {
-            // 충분한 시간이 지나지 않은 경우 delay 시간 후에 최신 value로 업데이트
-            const timerId = setTimeout(() => {
-                // 타이머가 만료되면 마지막 업데이트 시간을 현재 시각으로 갱신
-                lastExcuted.current = Date.now();
-                setThrottleValue(value);
-            },delay)
-            // CleanUp Fuction 이펙트가 재실행되기 전에 타이머가 실행되지 않았다면
-            // 기존 타이머를 clearTimeout을 통해 취소하여 중복 업데이트 방지
-            return () => clearTimeout(timerId)
+            return;
         }
-    },[value, delay]);
+
+        // 아직 delay가 지나지 않았으면 남은 시간만큼 기다려서 업데이트 (trailing)
+        const remaining = Math.max(0, lastExecuted.current + delay - now);
+
+        if (timerId.current) {
+            clearTimeout(timerId.current);
+        }
+
+        timerId.current = setTimeout(() => {
+            lastExecuted.current = Date.now();
+            setThrottleValue(value);
+            timerId.current = null;
+        }, remaining);
+
+        return () => {
+            if (timerId.current) {
+                clearTimeout(timerId.current);
+                timerId.current = null;
+            }
+        };
+    }, [value, delay]);
+
+    // 언마운트 시 안전하게 타이머 정리
+    useEffect(() => {
+        return () => {
+            if (timerId.current) {
+                clearTimeout(timerId.current);
+            }
+        };
+    }, []);
 
     return throttleValue;
 }
 
-export default useThrottle
+export default useThrottle;

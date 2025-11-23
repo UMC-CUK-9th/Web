@@ -8,15 +8,16 @@ import LpAdd from "../components/LpAdd";
 import { useEffect, useState } from "react";
 
 const HomeLayout = () => {
-  // ⭐ 사이드바 상태
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // ⭐ LP 추가 모달 상태
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const closeSidebar = () => setIsSidebarOpen(false);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
+  
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
@@ -28,12 +29,26 @@ const HomeLayout = () => {
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  
+  useEffect(() => {
+    if (!isSidebarOpen) return; 
+
+    const handleEscClose = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscClose);
+    return () => window.removeEventListener("keydown", handleEscClose);
   }, [isSidebarOpen]);
 
   return (
     <div className="h-dvh flex flex-col">
 
-      {/* 네비 */}
+      
       <Navbar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={toggleSidebar} />
 
       <div className="flex-1">
@@ -48,13 +63,13 @@ const HomeLayout = () => {
         </main>
       </div>
 
-      {/* ⭐ footer (그대로 유지) */}
+      
       <Footer />
 
-      {/* ⭐ 플로팅 버튼 (footer 위) */}
+      
       <FloatingButton onClick={() => setIsModalOpen(true)} />
 
-      {/* ⭐ LP 추가 모달은 layout에서 띄워야 안전함 */}
+      
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <LpAdd isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       </Modal>
