@@ -1,6 +1,9 @@
 
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { useLogoutMutation } from "../hooks/mutations/useLogoutMutation";
+import { User } from 'lucide-react';
+
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -8,11 +11,13 @@ interface HeaderProps {
 
 const Header = ({ onMenuClick }: HeaderProps) => {
   const navigate = useNavigate();
-  const { accessToken, logout, user } = useAuth();
+  const { accessToken, user } = useAuth();
   const isLoggedIn = !!accessToken;
 
-  const handleLogout = async () => {
-    await logout();
+  const { mutate: logoutMutate, isPending } = useLogoutMutation();
+
+  const handleLogout = () => {
+    logoutMutate();
   };
 
   return (
@@ -45,9 +50,10 @@ const Header = ({ onMenuClick }: HeaderProps) => {
           user ? (
 
             <>
-              <span className="hidden sm:inline text-sm text-gray-700">
-                {user.name}ㅎㅇ
-              </span>
+              <span className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold  text-indigo-600">
+  <User size={16} className="text-indigo-500" />
+  Hello {user.name}
+</span>
               <button
                 onClick={() => navigate("/my")}
                 className="px-3 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
@@ -56,6 +62,7 @@ const Header = ({ onMenuClick }: HeaderProps) => {
               </button>
               <button
                 onClick={handleLogout}
+                disabled={isPending}
                 className="px-3 py-2 text-sm font-medium rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
               >
                 로그아웃

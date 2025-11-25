@@ -7,6 +7,18 @@ interface CustomInternalAxiosRequestConfig extends InternalAxiosRequestConfig {
 
 let refreshPromise: Promise<string> | null = null;
 
+
+const handleLogout = () => {
+  localStorage.removeItem(LOCAL_STORAGE_KEY.accessToken);
+  localStorage.removeItem(LOCAL_STORAGE_KEY.refreshToken);
+
+  if (window.location.pathname !== '/login') {
+    window.location.href = '/login'; 
+    window.location.reload();
+
+  }
+};
+
 export const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_APP_BASE_URL,
 
@@ -47,6 +59,7 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
 
       if (originalRequest.url === '/v1/auth/refresh') {
+        handleLogout();
         return Promise.reject(error);
       }
 
@@ -86,6 +99,7 @@ axiosInstance.interceptors.response.use(
 
             return newAccessToken; 
           } catch (e) {
+            handleLogout();
             return Promise.reject(e);
           } finally {
             refreshPromise = null; 
@@ -103,6 +117,7 @@ axiosInstance.interceptors.response.use(
 
         return axiosInstance(originalRequest);
       } catch (err) {
+        handleLogout();
         return Promise.reject(err);
       }
     }

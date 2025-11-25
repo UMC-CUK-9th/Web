@@ -17,6 +17,7 @@ function useGetInfiniteLpList(
             return lastPage.data.hasNext?lastPage.data.nextCursor : undefined;
 
         },
+        staleTime: 1000 * 60 * 1,
     });
 }
 

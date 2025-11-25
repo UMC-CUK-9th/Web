@@ -5,14 +5,15 @@ import {useInView} from "react-intersection-observer";
 import LpCard from "../components/LpCard/LpCard";
 import LpCardSkeletonList from "../components/LpCard/LpCardSkeletonList";
 import type { PaginationDto } from "../types/common"; 
+import { useDebounce } from "../hooks/useDebounce";
 
 const HomePage = () => {
   const [search, setSearch] = useState("");
-
+const debouncedSearch = useDebounce(search, 300);
   const [order, setOrder] = useState<PaginationDto['order']>(PAGINATION_ORDER.desc);
 
 
-  const {data:lps, isFetching, hasNextPage, isPending, fetchNextPage, isError, refetch} = useGetInfiniteLpList( 10, search, order);
+  const {data:lps, isFetching, hasNextPage, isPending, fetchNextPage, isError, refetch} = useGetInfiniteLpList( 10, debouncedSearch, order);
 
   const {ref, inView} = useInView(
     {threshold: 0,
@@ -26,9 +27,7 @@ if (inView) {
     }
   }, [inView, isFetching, hasNextPage, fetchNextPage]);
 
-  if (isPending) {
-    return <div className={"mt-20"}>Loading...</div>;
-  }
+
 
 if (isError) {
     return (
@@ -85,11 +84,12 @@ if (isError) {
 
 
       <div className={"grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"}>
+        {isPending && <LpCardSkeletonList count={10} />}
         {lps?.pages
         ?.map ((page)=>page.data.data)
         ?.flat()
         ?.map((lp)=> <LpCard key={lp.id} lp={lp} />)}
-        {isFetching && <LpCardSkeletonList count = {20} />}
+        {isFetching && !isPending && <LpCardSkeletonList count={20} />}
         </div>
         <div ref={ref} className="h-2"></div>
     </div>

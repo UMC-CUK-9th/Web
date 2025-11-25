@@ -1,12 +1,13 @@
 
 
-import { useState, type PropsWithChildren, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, type PropsWithChildren, useCallback, useMemo } from "react";
+
 import { AuthContext } from "./AuthContext";
-import type { RequestSigninDto, User } from "../types/auth";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import { LOCAL_STORAGE_KEY } from "../constants/key";
-import { postLogout, postSignin, getMyInfo } from "../apis/auth";
+import { LOCAL_STORAGE_KEY, QUERY_KEY } from "../constants/key";
+
+import { queryClient } from "../App";
+import useGetMyInfo from "../hooks/queries/useGetMyInfo";
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
   const {
@@ -29,84 +30,59 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     getRefreshTokenFromStorage()
   );
 
-  const [user, setUser] = useState<User | null>(null);
-
-  const navigate = useNavigate();
 
 
-  const logout = useCallback(async () => {
-    try {
-      await postLogout();
-    } catch (error) {
-      console.error("에러", error);
-    } finally {
-      removeAccessTokenFromStorage();
-      removeRefreshTokenFromStorage();
 
-      setAccessToken(null);
-      setRefreshToken(null);
-      setUser(null);
 
-      alert("로그아웃");
-      navigate("/");
-    }
+  const { data: myInfoResponse } = useGetMyInfo(accessToken);
+  const user = myInfoResponse?.data ?? null;
+
+
+
+const clearAuthData = useCallback(() => {
+    removeAccessTokenFromStorage();
+    removeRefreshTokenFromStorage();
+
+    setAccessToken(null);
+    setRefreshToken(null);
+    queryClient.removeQueries({ queryKey: [QUERY_KEY.myInfo] });
   }, [
-    navigate,
     removeAccessTokenFromStorage,
     removeRefreshTokenFromStorage,
   ]);
 
 
-  useEffect(() => {
-    const fetchUserInfo = async () => {
+const setAuthData = useCallback(
+    async (newAccessToken: string, newRefreshToken: string) => {
       try {
-        const response = await getMyInfo();
-        setUser(response.data);
-      } catch (error) {
-        console.error("에러", error);
-        logout(); 
-      }
-    };
-
-    if (accessToken) {
-      fetchUserInfo();
-    } else {
-      setUser(null);
-    }
-  }, [accessToken, logout]); 
-
-  const login = async (signinData: RequestSigninDto) => {
-    try {
-      const response = await postSignin(signinData);
-      const { data: responseData } = response; 
-
-      if (responseData) {
-        const newAccessToken = responseData.accessToken;
-        const newRefreshToken = responseData.refreshToken;
-
         setAccessTokenStorage(newAccessToken);
         setRefreshTokenStorage(newRefreshToken);
 
         setAccessToken(newAccessToken);
         setRefreshToken(newRefreshToken);
 
-        alert("로그인 성공");
-        navigate("/");
-      } else {
-        throw new Error("에러");
-      }
-    } catch (error) {
-      console.error("로그인 오류", error);
-      alert("로그인 실패");
-      throw error;
-    }
-  };
+        await queryClient.invalidateQueries({ queryKey: [QUERY_KEY.myInfo] });
 
-  return (
-    <AuthContext.Provider
-      value={{ accessToken, refreshToken, user, login, logout }}
-    >
-      {children}
-    </AuthContext.Provider>
+        alert("로그인 성공");
+      } catch (error) {
+        console.error("인증 상태 설정 오류", error);
+        alert("로그인 처리에 실패했습니다.");
+      }
+    },
+    [setAccessTokenStorage, setRefreshTokenStorage]
   );
+
+const value = useMemo(
+    () => ({
+      accessToken,
+      refreshToken,
+      user,
+      setAuthData, 
+      clearAuthData,
+    }),
+    [accessToken, refreshToken, user, setAuthData, clearAuthData]
+  );
+
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import type { LpItem } from "../../types/lp";
 import { Heart, Calendar } from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
 
 interface LpCardProps {
     lp: LpItem;
@@ -24,13 +25,27 @@ const formatDate = (dateString: Date) => {
 };
 const LpCard = ( {lp}:LpCardProps) => {
 
+
     const navigate = useNavigate();
+    const { accessToken } = useAuth()
+
     const likesCount = lp.likes.length;
     const formattedDate = formatDate(lp.createdAt);
 
+    const handleCardClick = () => {
+    if (!accessToken) {
+      alert("로그인이 필요한 서비스입니다."); 
+      navigate("/login");
+      return; 
+    }
+
+
+    navigate(`/lps/${lp.id}`);
+  };
+
     return ( 
         <div 
-        onClick={()=>navigate(`/lps/${lp.id}`)}
+        onClick={handleCardClick}
         className="group relative rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 cursor-pointer">
           <img
           src={lp.thumbnail}
