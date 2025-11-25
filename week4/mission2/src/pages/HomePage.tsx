@@ -6,11 +6,26 @@ import { useInView } from "react-intersection-observer";
 import LpCard from "../components/LpCard/LpCard";
 import LpCardSkeletonList from "../components/LpCard/LpCardSkeletonList";
 import FloatingButton from "../components/FloatingButton";
+import LpAdd from "../components/LpAdd";
+import { Modal } from "../components/Modal";
+import useDebounce from "../hooks/useDebounce";
+import { SEARCH_DEBOUNCE_DELAY } from "../constants/delay";
 
 const HomePage = () => {
+
+  
+  const [search, setSearch] = useState("");
+
+  
+  const debouncedSearch = useDebounce(search, SEARCH_DEBOUNCE_DELAY);
+
+  
   const [order, setOrder] = useState<PAGINATION_ORDER | null>(null);
+
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  
   const {
     data: lps,
     isFetching,
@@ -18,7 +33,11 @@ const HomePage = () => {
     isPending,
     fetchNextPage,
     isError,
-  } = useGetInfiniteLpList(10, "", order ?? PAGINATION_ORDER.desc);
+  } = useGetInfiniteLpList(
+    10,
+    debouncedSearch, 
+    order ?? PAGINATION_ORDER.desc
+  );
 
   const { ref, inView } = useInView({ threshold: 0 });
 
@@ -46,7 +65,17 @@ const HomePage = () => {
 
   return (
     <div className="relative bg-fuchsia-100 min-h-screen w-full flex flex-col items-center overflow-x-hidden">
+
       
+      <div className="w-full max-w-[1600px] px-10 mt-8">
+        <input
+          className="w-full border rounded-lg p-4 text-lg"
+          placeholder="검색어를 입력하세요."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+
       {/* 정렬 버튼 */}
       <div className="flex justify-end w-full max-w-[1600px] pt-4 pr-10 gap-2">
         <button
@@ -68,7 +97,7 @@ const HomePage = () => {
         </button>
       </div>
 
-      {/* 카드 */}
+      {/* 카드 리스트 */}
       <div className="w-full max-w-[1600px] p-10 grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {lps?.pages
           ?.map((page) => page?.data?.data ?? [])
@@ -82,11 +111,13 @@ const HomePage = () => {
 
       <div ref={ref} className="h-2"></div>
 
-      {/* 버튼 */}
+      {/* 플로팅 버튼 */}
       <FloatingButton onClick={() => setIsModalOpen(true)} />
 
-      {/* 모달 */}
-      
+      {/* LP 추가 모달 */}
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <LpAdd isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      </Modal>
     </div>
   );
 };
