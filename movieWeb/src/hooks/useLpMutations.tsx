@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../api/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 export const useLpMutations = (lpId: string) => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   // LP 수정
   const updateLp = useMutation({
@@ -10,7 +12,7 @@ export const useLpMutations = (lpId: string) => {
       title: string;
       content: string;
       thumbnail: string;
-      tags: string[];
+      tags: Array<string | { id: number; name: string }>;
     }) => {
       const res = await axiosInstance.patch(`/lps/${lpId}`, body);
       return res.data.data;
@@ -30,7 +32,7 @@ export const useLpMutations = (lpId: string) => {
     },
     onSuccess: () => {
       alert("삭제가 완료되었습니다.");
-      window.location.href = "/lplist"; // 목록으로 이동
+      navigate("/lplist");
     },
   });
 
@@ -40,7 +42,7 @@ export const useLpMutations = (lpId: string) => {
       await axiosInstance.post(`/lps/${lpId}/likes`);
     },
 
-    // 🔥 낙관적 업데이트
+    // 낙관적 업데이트
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ["lp", lpId] });
 
@@ -51,15 +53,16 @@ export const useLpMutations = (lpId: string) => {
       queryClient.setQueryData(["lp", lpId], (old: any) => {
         if (!old) return old;
 
+        const likes = old.likes ?? [];
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const alreadyLiked = old.likes?.some((l: any) => l.userId === old.meId);
+        const alreadyLiked = likes.some((l: any) => l.userId === old.meId);
 
         return {
           ...old,
           likes: alreadyLiked
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ? old.likes.filter((l: any) => l.userId !== old.meId)
-            : [...old.likes, { userId: old.meId }],
+            ? likes.filter((l: any) => l.userId !== old.meId)
+            : [...likes, { userId: old.meId }],
         };
       });
 

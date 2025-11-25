@@ -20,14 +20,17 @@ export const useAuthMutations = () => {
   // 로그아웃
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      axiosInstance.post("/auth/logout")
-      localStorage.removeItem(LOCAL_STORAGE_KEY.accessToken);
-      localStorage.removeItem(LOCAL_STORAGE_KEY.refreshToken);
-      localStorage.removeItem("userName");
+      try {
+        await axiosInstance.post("/auth/logout");
+      } finally {
+        localStorage.removeItem(LOCAL_STORAGE_KEY.accessToken);
+        localStorage.removeItem(LOCAL_STORAGE_KEY.refreshToken);
+        localStorage.removeItem("userName");
 
-      // Navbar / Sidebar 등이 듣고 있는 이벤트
-      window.dispatchEvent(new Event("authChange"));
-      window.location.href = "/";
+        // Navbar / Sidebar 등이 듣고 있는 이벤트
+        window.dispatchEvent(new Event("authChange"));
+        window.location.href = "/";
+      }
       return true;
     },
   });

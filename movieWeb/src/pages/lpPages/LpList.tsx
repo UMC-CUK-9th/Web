@@ -7,12 +7,19 @@ import type { LpItem } from "../../types/lp";
 import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import FloatingButton from "../../components/FloatingButton";
-// import LpCardSkeleton from "../../components/LpCardSkeleton";
+import useDebounce from "../../hooks/useDebounce";
+import useThrottle from "../../hooks/useThrottle";
 
 const LpList = () => {
   const [sort, setSort] = useState<"asc" | "desc">("desc");
+  const [search, setSearch] = useState("");
+  const [loadTrigger, setLoadTrigger] = useState(0);
+
+  const debouncedSearch = useDebounce(search, 300);
+  const throttledLoadTrigger = useThrottle(loadTrigger, 3000);
+  
   const navigate = useNavigate();
-  const loadMoreRef = useRef<HTMLDivElement | null>(null); 
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const {
     data,
@@ -24,27 +31,58 @@ const LpList = () => {
     isFetchingNextPage,
     refetch,
   } = useInfiniteQuery({
-    queryKey: ["lps", sort],
-    queryFn: ({ pageParam = 0 }) => fetchLpList({ pageParam, sort }),
+    queryKey: ["lps", sort, debouncedSearch],
+    enabled: debouncedSearch.trim().length >= 0,
+
+
+    queryFn: ({ pageParam = 0 }) =>
+      fetchLpList({
+        pageParam,
+        sort,
+        search: debouncedSearch.trim() ==="" ? undefined: debouncedSearch.trim(),
+      }),
+
+
     getNextPageParam: (lastPage) =>
       lastPage.hasNext ? lastPage.nextCursor : undefined,
+
+
     initialPageParam: 0,
     staleTime: 1000 * 60,
     gcTime: 1000 * 60 * 5,
   });
 
+  // --- IntersectionObserver ---
+  // useEffect(() => {
+  //   if (!hasNextPage || isFetchingNextPage) return;
+
+  //   const observer = new IntersectionObserver(
+  //     (entries) => {
+  //       const [entry] = entries;
+  //       if (entry.isIntersecting) fetchNextPage();
+  //     },
+  //     { rootMargin: "200px" }
+  //   );
+
+  //   const target = loadMoreRef.current;
+  //   if (!target) return;
+
+  //   observer.observe(target);
+
+  //   return () => {
+  //     observer.unobserve(target);
+  //   };
+  // }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   useEffect(() => {
-    if (!hasNextPage || isFetchingNextPage) return;
-
     const observer = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
         if (entry.isIntersecting) {
-          fetchNextPage(); // 화면에 보이면 다음 페이지 자동 요청
+          setLoadTrigger((prev) => prev + 1);
         }
       },
-      { rootMargin: "200px" } // 조금 일찍 로드 (스크롤 여유)
+      { rootMargin: "200px" }
     );
 
     const target = loadMoreRef.current;
@@ -53,8 +91,15 @@ const LpList = () => {
     return () => {
       if (target) observer.unobserve(target);
     };
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+  }, []);
 
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+    fetchNextPage();
+  }, [throttledLoadTrigger]);
+
+
+  // Loading & Error
   if (isLoading) return <Loading />;
   if (isError)
     return (
@@ -65,19 +110,26 @@ const LpList = () => {
       />
     );
 
-  // 모든 페이지 데이터 합치기
+  // 전체 데이터 merge
   const lpList: LpItem[] = data?.pages.flatMap((page) => page.data) || [];
 
   return (
     <div className="max-w-7xl mx-auto my-12 px-4">
-      {/* 정렬 옵션 */}
+      {/* 상단 - 검색 + 정렬 */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">LP 목록</h1>
 
         <div className="flex items-center gap-3">
-          <label htmlFor="sort" className="text-sm text-gray-600">
-            정렬:
-          </label>
+          {/* 검색 입력 */}
+          <input
+            type="text"
+            placeholder="검색어 입력..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="border border-gray-300 rounded-md text-sm px-3 py-1 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+          />
+
+          {/* 정렬 필터 */}
           <select
             id="sort"
             value={sort}
@@ -121,7 +173,7 @@ const LpList = () => {
         ))}
       </div>
 
-      {/* IntersectionObserver target */}
+      {/* InfiniteScroll Target */}
       <div ref={loadMoreRef} className="mt-8 flex justify-center">
         {isFetchingNextPage && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 w-full">
@@ -135,7 +187,6 @@ const LpList = () => {
         )}
       </div>
 
-      {/* 플로팅 버튼 */}
       <FloatingButton />
     </div>
   );
