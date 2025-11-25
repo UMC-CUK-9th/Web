@@ -6,12 +6,10 @@ function useDeleteComment() {
   return useMutation({
     mutationFn: deleteComment,
     onSuccess: () => {
-      console.log("useDeleteComment 실행됨");
       queryClient.invalidateQueries({
         queryKey: ["comment"],
         exact: true,
       });
-      window.location.reload();
     },
   });
 }

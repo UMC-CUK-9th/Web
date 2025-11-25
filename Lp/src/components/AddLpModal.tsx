@@ -33,6 +33,11 @@ export default function AddLpModal({
   };
   const { mutate } = usePostLp();
   const handleAddLp = () => {
+    if (!lpName.trim() || !lpContent.trim()) {
+      alert("제목과 내용을 입력해주세요.");
+      return;
+    }
+
     const lpData = {
       title: lpName,
       content: lpContent,
@@ -40,7 +45,6 @@ export default function AddLpModal({
       tags: lpTagList,
       published: true,
     };
-    console.log(lpData);
     mutate(lpData, {
       onSuccess: () => {
         setLpName("");
@@ -134,8 +138,11 @@ export default function AddLpModal({
                 </button>
               </div>
               <div className="flex flex-wrap gap-2">
-                {lpTagList.map((tag) => (
-                  <div className="flex gap-2 border border-white rounded p-2">
+                {lpTagList.map((tag, idx) => (
+                  <div
+                    key={idx}
+                    className="flex gap-2 border border-white rounded p-2"
+                  >
                     {tag}
                     <button
                       className="cursor-pointer"

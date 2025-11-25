@@ -6,12 +6,9 @@ function usePostLp() {
   return useMutation({
     mutationFn: postLps,
     onSuccess: (data) => {
-      console.log("usePostLp 실행됨");
       queryClient.invalidateQueries({
         queryKey: ["lps", data.data.id],
-        exact: true,
       });
-      window.location.reload();
     },
   });
 }

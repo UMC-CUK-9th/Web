@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import { getMe, postLogout } from "../apis/auth";
+import { postLogout } from "../apis/auth";
 import type { Profile } from "../types/users";
 import { FaSearch } from "react-icons/fa";
 import Menu from "../assets/icons/hamburger-button.svg";
+import { getMe } from "../apis/users";
 
-const Navbar = () => {
+interface props {
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const Navbar = ({ setIsOpen }: props) => {
   const [myInfo, setMyInfo] = useState<Profile>();
   const { getItem } = useLocalStorage("accessToken");
   const token = getItem();
@@ -28,10 +33,27 @@ const Navbar = () => {
     navigate("/");
   };
 
+  useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("keydown", handleEscKey);
+    return () => {
+      document.removeEventListener("keydown", handleEscKey);
+    };
+  }, [setIsOpen]);
+
   return (
     <nav className="flex justify-between p-5 bg-[#252525ff] text-white text-center">
       <div className="flex items-center gap-3">
-        <img src={Menu} alt="menu" className="w-6 h-6 invert cursor-pointer" />
+        <img
+          src={Menu}
+          alt="menu"
+          className="w-6 h-6 invert cursor-pointer"
+          onClick={() => setIsOpen((prev) => !prev)}
+        />
         <NavLink to="/" className="text-pink-500 text-2xl font-bold">
           돌려돌려Lp판
         </NavLink>
