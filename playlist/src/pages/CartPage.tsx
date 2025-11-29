@@ -1,24 +1,23 @@
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../store/store";
-import { increase, decrease, calculateTotals } from "../store/slices/cartSlice";
-import { useEffect } from "react";
 import Modal from "../components/Modal";
-import { openModal } from "../store/slices/modalSlice";
+import { usePlaylistStore } from "../stores/playlistStore";
 
 const CartPage = () => {
-  const dispatch = useDispatch();
-  const { cartItems, total, amount } = useSelector((state: RootState) => state.cart);
-  const isOpen = useSelector((state: RootState) => state.modal.isOpen); 
-
-  useEffect(() => {
-    dispatch(calculateTotals());
-  }, [cartItems, dispatch]);
+  const cartItems = usePlaylistStore((state) => state.cartItems);
+  const total = usePlaylistStore((state) => state.total);
+  const amount = usePlaylistStore((state) => state.amount);
+  const isModalOpen = usePlaylistStore((state) => state.isModalOpen);
+  
+  const increase = usePlaylistStore((state) => state.increase);
+  const decrease = usePlaylistStore((state) => state.decrease);
+  const openModal = usePlaylistStore((state) => state.openModal);
 
   return (
     <div className="w-full px-20 py-10">
-    {isOpen && <Modal />}
-      <div className="space-y-6">
 
+      {/* 모달 */}
+      {isModalOpen && <Modal />}
+
+      <div className="space-y-6">
         {cartItems.map((item) => (
           <div
             key={item.id}
@@ -34,22 +33,24 @@ const CartPage = () => {
               <div>
                 <h2 className="font-semibold text-lg">{item.title}</h2>
                 <p className="text-sm text-gray-500">{item.singer}</p>
-                <p className="font-bold mt-1">₩{Number(item.price).toLocaleString()}</p>
+                <p className="font-bold mt-1">
+                  ₩{Number(item.price).toLocaleString()}
+                </p>
               </div>
             </div>
 
             {/* 수량 버튼 */}
             <div className="flex items-center gap-2">
               <button
-                className="px-3 py-1 border rounded"
-                onClick={() => dispatch(decrease(item.id))}
+                className="px-3 py-1 border rounded hover:bg-gray-100"
+                onClick={() => decrease(item.id)}
               >
                 -
               </button>
-              <span className="font-semibold">{item.amount}</span>
+              <span className="font-semibold w-6 text-center">{item.amount}</span>
               <button
-                className="px-3 py-1 border rounded"
-                onClick={() => dispatch(increase(item.id))}
+                className="px-3 py-1 border rounded hover:bg-gray-100"
+                onClick={() => increase(item.id)}
               >
                 +
               </button>
@@ -64,9 +65,10 @@ const CartPage = () => {
         <p className="text-2xl font-bold mb-6">
           총 금액: ₩{total.toLocaleString()}
         </p>
+
         <button
-          onClick={() => dispatch(openModal())}
-          className="px-6 py-3 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition"
+          onClick={openModal}
+          className="px-6 py-3 border border-black rounded-lg font-semibold hover:bg-red-600 hover:border-none hover:text-white transition"
         >
           전체 삭제
         </button>
