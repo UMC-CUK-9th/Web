@@ -1,11 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store/store";
-import { increase, decrease, clearCart, calculateTotals } from "../store/cartSlice";
+import { increase, decrease, calculateTotals } from "../store/slices/cartSlice";
 import { useEffect } from "react";
+import Modal from "../components/Modal";
+import { openModal } from "../store/slices/modalSlice";
 
 const CartPage = () => {
   const dispatch = useDispatch();
   const { cartItems, total, amount } = useSelector((state: RootState) => state.cart);
+  const isOpen = useSelector((state: RootState) => state.modal.isOpen); 
 
   useEffect(() => {
     dispatch(calculateTotals());
@@ -13,7 +16,7 @@ const CartPage = () => {
 
   return (
     <div className="w-full px-20 py-10">
-
+    {isOpen && <Modal />}
       <div className="space-y-6">
 
         {cartItems.map((item) => (
@@ -61,10 +64,9 @@ const CartPage = () => {
         <p className="text-2xl font-bold mb-6">
           총 금액: ₩{total.toLocaleString()}
         </p>
-
         <button
-          onClick={() => dispatch(clearCart())}
-          className="px-6 py-3 rounded-lg border border-black border-radius-10 font-semibold hover:bg-red-600 hover:text-white hover:border-none transition"
+          onClick={() => dispatch(openModal())}
+          className="px-6 py-3 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition"
         >
           전체 삭제
         </button>
