@@ -1,3 +1,4 @@
+import type{ ReactElement } from "react";
 interface InputProps {
   value: string;
   onChange: (value: string) => void;
@@ -10,7 +11,7 @@ export const Input = ({
   onChange,
   placeholder = "검색어를 입력하세요.",
   className,
-}: InputProps): Element => {
+}: InputProps): ReactElement => {
   return (
     <input
       className={`w-full rounded-md border-gray-500 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${className}`}

@@ -1,11 +1,26 @@
-import React from 'react';
-import UseMemoPage from './UseMemoPage';
+
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import HomePage from './pages/HomPage';
+import MovieDetailPage from './pages/MovieDetailPage';
 
 
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <HomePage />
+  },
+  {
+    path: '/:id',
+    element: <MovieDetailPage />
+  }
+]);
 
 function App(){
-  return <HomePage />
+  return (
+    <div>
+    <RouterProvider router={router} />
+    </div>
+  )
 }
 
 export default App;

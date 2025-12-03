@@ -1,12 +1,11 @@
 import type{ Movie } from "../types/movie";
-// import { X } from "lucide-react"; // 아이콘 라이브러리 (루시드 아이콘 사용) - 💡 삭제됨
-
+import type{ ReactElement } from "react";
 interface MovieDetailModalProps {
   movie: Movie;
   onClose: () => void;
 }
 
-const MovieDetailModal = ({ movie, onClose }: MovieDetailModalProps): Element => {
+const MovieDetailModal = ({ movie, onClose }: MovieDetailModalProps): ReactElement => {
   const imageBaseUrl = "https://image.tmdb.org/t/p/w500";
   const backdropBaseUrl = "https://image.tmdb.org/t/p/w1280";
   const fallbackImageImage = "https://placehold.co/640x480/cccccc/333333?text=Poster+Not+Found"; 

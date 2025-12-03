@@ -1,11 +1,11 @@
 import { useState, useMemo } from "react";
 import useFetch from "../hooks/useFetch";
-import type{ MovieResponse, MovieFilters, Movie } from "../types/movie";
+import type{ MovieResponse, Movie, MovieFilters } from "../types/movie";
 import MovieFilter from "../components/MovieFilter";
 import MovieList from "../components/MovieList";
-import MovieDetailModal from "../components/MovieDetailModal"; // 💡 새로 임포트
-
-export default function HomePage(): Element {
+import MovieDetailModal from "../components/MovieDetailModal"; // 💡 새로 임포트import type{ ReactElement } from "react";
+import type{ ReactElement } from "react";
+export default function HomePage(): ReactElement {
   const [filters, setFilters] = useState<MovieFilters>({
     query: "어벤져스",
     include_adult: false,

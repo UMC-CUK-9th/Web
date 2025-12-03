@@ -1,4 +1,5 @@
 import type{ Movie } from "../types/movie";
+import type{ ReactElement } from "react";
 
 interface MovieCardProps {
   movie: Movie;
@@ -7,7 +8,7 @@ interface MovieCardProps {
 }
 
 // 💡 Props에 onMovieClick을 받도록 변경
-const MovieCard = ({ movie, onMovieClick }: MovieCardProps): Element => {
+const MovieCard = ({ movie, onMovieClick }: MovieCardProps): ReactElement => {
   const imageBaseUrl = "https://image.tmdb.org/t/p/w500";
   // NOTE: 플레이스홀더 이미지 URL을 사용합니다.
   const fallbackImageImage = "https://placehold.co/640x480/cccccc/333333?text=Poster+Not+Found"; 

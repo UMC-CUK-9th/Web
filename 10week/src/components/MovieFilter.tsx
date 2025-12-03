@@ -1,15 +1,16 @@
 import { useState, memo } from "react";
-import type{ MovieFilters, MovieLanguage } from "../types/movie";
+import type{ MovieFilters } from "../types/movie";
 import { Input } from "./input";
 import { SelectBox } from "./SelectBox";
 import { LANGUAGE_OPTIONS } from "../constants/movie";
 import LanguageSelector from "./LanguageSelector";
+import type{ ReactElement } from "react";
 
 interface MovieFilterProps {
   onChange: (filter: MovieFilters) => void;
 }
 
-const MovieFilter = ({ onChange }: MovieFilterProps): Element => {
+const MovieFilter = ({ onChange }: MovieFilterProps): ReactElement => {
   const [query, setQuery] = useState<string>("");
   const [includeAdult, setIncludeAdult] = useState<boolean>(false);
   const [language, setLanguage] = useState("ko-KR");

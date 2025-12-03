@@ -1,5 +1,6 @@
 import type{ Movie } from "../types/movie";
 import MovieCard from "./MovieCard"; // MovieCard 임포트 확인
+import type{ ReactElement } from "react";
 
 interface MovieListProps {
   movies: Movie[];
@@ -8,7 +9,7 @@ interface MovieListProps {
 }
 
 // 💡 Props에 onMovieClick을 받도록 변경
-const MovieList = ({ movies, onMovieClick }: MovieListProps): Element => {
+const MovieList = ({ movies, onMovieClick }: MovieListProps): ReactElement => {
   if (movies.length === 0) {
     return (
       <div className="flex h-60 items-center justify-center">

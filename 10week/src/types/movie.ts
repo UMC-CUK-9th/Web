@@ -1,6 +1,6 @@
 export type MovieLanguage = "ko-KR" | "en-US" | "ja-JP";
 
-export type MovieFilter = {
+export type MovieFilters = {
     query:string;
     include_adult: boolean;
     language: string;
