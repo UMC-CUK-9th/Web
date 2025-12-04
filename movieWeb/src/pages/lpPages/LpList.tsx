@@ -1,14 +1,19 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+
 import Loading from "../../components/common/Loading";
 import ErrorFallback from "../../components/common/ErrorFallBack";
+import FloatingButton from "../../components/FloatingButton";
+
 import { fetchLpList } from "../../services/fetchLpList";
 import type { LpItem } from "../../types/lp";
-import { Heart } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import FloatingButton from "../../components/FloatingButton";
+
 import useDebounce from "../../hooks/useDebounce";
 import useThrottle from "../../hooks/useThrottle";
+
+import LpToolbar from "../../components/LpToolbar";
+import LpGrid from "../../components/LpGrid";
 
 const LpList = () => {
   const [sort, setSort] = useState<"asc" | "desc">("desc");
@@ -17,7 +22,7 @@ const LpList = () => {
 
   const debouncedSearch = useDebounce(search, 300);
   const throttledLoadTrigger = useThrottle(loadTrigger, 3000);
-  
+
   const navigate = useNavigate();
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -32,72 +37,74 @@ const LpList = () => {
     refetch,
   } = useInfiniteQuery({
     queryKey: ["lps", sort, debouncedSearch],
-    enabled: debouncedSearch.trim().length >= 0,
-
-
+    enabled: true,
     queryFn: ({ pageParam = 0 }) =>
       fetchLpList({
         pageParam,
         sort,
-        search: debouncedSearch.trim() ==="" ? undefined: debouncedSearch.trim(),
+        search:
+          debouncedSearch.trim() === "" ? undefined : debouncedSearch.trim(),
       }),
-
-
     getNextPageParam: (lastPage) =>
       lastPage.hasNext ? lastPage.nextCursor : undefined,
-
-
     initialPageParam: 0,
     staleTime: 1000 * 60,
     gcTime: 1000 * 60 * 5,
   });
 
-  // --- IntersectionObserver ---
-  // useEffect(() => {
-  //   if (!hasNextPage || isFetchingNextPage) return;
-
-  //   const observer = new IntersectionObserver(
-  //     (entries) => {
-  //       const [entry] = entries;
-  //       if (entry.isIntersecting) fetchNextPage();
-  //     },
-  //     { rootMargin: "200px" }
-  //   );
-
-  //   const target = loadMoreRef.current;
-  //   if (!target) return;
-
-  //   observer.observe(target);
-
-  //   return () => {
-  //     observer.unobserve(target);
-  //   };
-  // }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   useEffect(() => {
+    const target = loadMoreRef.current;
+    if (!target) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
-        if (entry.isIntersecting) {
+        if (
+          entry.isIntersecting &&
+          hasNextPage && // 더 가져올 게 있을 때만
+          !isFetchingNextPage // 이미 가져오는 중이 아닐 때만
+        ) {
           setLoadTrigger((prev) => prev + 1);
         }
       },
       { rootMargin: "200px" }
     );
 
-    const target = loadMoreRef.current;
-    if (target) observer.observe(target);
+    observer.observe(target);
 
     return () => {
-      if (target) observer.unobserve(target);
+      observer.disconnect();
     };
-  }, []);
+  }, [hasNextPage, isFetchingNextPage]);
 
+  // throttledLoadTrigger가 변할 때만 다음 페이지 요청
   useEffect(() => {
     if (!hasNextPage || isFetchingNextPage) return;
     fetchNextPage();
-  }, [throttledLoadTrigger]);
+  }, [throttledLoadTrigger, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+
+  const handleChangeSearch = useCallback((value: string) => {
+    setSearch(value);
+  }, []);
+
+  const handleChangeSort = useCallback((value: "asc" | "desc") => {
+    setSort(value);
+  }, []);
+
+  const handleClickItem = useCallback(
+    (id: string | number) => {
+      navigate(`/lp/${id}`);
+    },
+    [navigate]
+  );
+
+  // 전체 데이터 merge (계산은 useMemo로 한 번만)
+  const lpList: LpItem[] = useMemo(
+    () => data?.pages.flatMap((page) => page.data) || [],
+    [data]
+  );
 
   // Loading & Error
   if (isLoading) return <Loading />;
@@ -110,68 +117,18 @@ const LpList = () => {
       />
     );
 
-  // 전체 데이터 merge
-  const lpList: LpItem[] = data?.pages.flatMap((page) => page.data) || [];
-
   return (
     <div className="max-w-7xl mx-auto my-12 px-4">
       {/* 상단 - 검색 + 정렬 */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">LP 목록</h1>
-
-        <div className="flex items-center gap-3">
-          {/* 검색 입력 */}
-          <input
-            type="text"
-            placeholder="검색어 입력..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border border-gray-300 rounded-md text-sm px-3 py-1 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
-          />
-
-          {/* 정렬 필터 */}
-          <select
-            id="sort"
-            value={sort}
-            onChange={(e) => setSort(e.target.value as "asc" | "desc")}
-            className="border border-gray-300 rounded-md text-sm px-3 py-1 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
-          >
-            <option value="desc">최신순</option>
-            <option value="asc">오래된순</option>
-          </select>
-        </div>
-      </div>
+      <LpToolbar
+        search={search}
+        sort={sort}
+        onChangeSearch={handleChangeSearch}
+        onChangeSort={handleChangeSort}
+      />
 
       {/* 카드 목록 */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        {lpList.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => navigate(`/lp/${item.id}`)}
-            className="relative w-full overflow-hidden rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 transition cursor-pointer aspect-square group text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-500"
-          >
-            <img
-              src={item.thumbnail}
-              alt={item.title}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-in-out"
-            />
-
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 ease-in-out flex flex-col justify-end p-3">
-              <h2 className="text-white font-semibold text-sm line-clamp-1 mb-1 drop-shadow-md">
-                {item.title}
-              </h2>
-              <div className="flex justify-between items-center text-xs text-gray-200 drop-shadow-sm">
-                <p>{new Date(item.createdAt).toLocaleDateString("ko-KR")}</p>
-                <div className="flex items-center gap-1">
-                  <Heart size={14} className="text-red-400" />
-                  <span>{item.likes?.length ?? 0}</span>
-                </div>
-              </div>
-            </div>
-          </button>
-        ))}
-      </div>
+      <LpGrid items={lpList} onClickItem={handleClickItem} />
 
       {/* InfiniteScroll Target */}
       <div ref={loadMoreRef} className="mt-8 flex justify-center">
