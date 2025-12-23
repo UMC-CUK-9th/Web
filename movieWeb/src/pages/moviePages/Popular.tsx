@@ -1,69 +1,126 @@
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { Movie } from "../../types/movie";
-import { fetchMovies } from "../../services/fetchMovies";
-import { Link } from "react-router-dom";
-import Loading from "../../components/common/Loading";
+import { fetchMovies, searchMovies } from "../../services/fetchMovies";
 import { useCustomFetch } from "../../hooks/useCustomFetch";
+import Loading from "../../components/common/Loading";
 import ErrorFallback from "../../components/common/ErrorFallBack";
+import MovieModal from "../../components/MovieModal";
+import MovieSearchForm from "../../components/MovieSearchForm";
+import Pagination from "../../components/Pagination";
+import MovieGrid from "../../components/MovieGrid";
 
 const Popular = () => {
-  const [page, setPage] = useState<number>(1);
+  const [page, setPage] = useState(1);
+
+  // 폼 값
+  const [searchTerm, setSearchTerm] = useState("");
+  const [formIncludeAdult, setFormIncludeAdult] = useState(false);
+  const [formLanguage, setFormLanguage] = useState("ko-KR");
+
+  // 실제 적용 값
+  const [query, setQuery] = useState("");
+  const [includeAdult, setIncludeAdult] = useState(false);
+  const [language, setLanguage] = useState("ko-KR");
+  const [isSearching, setIsSearching] = useState(false);
+
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+
+  // API 호출 함수: useCallback으로 고정
+  const getMovies = useCallback(() => {
+    return isSearching
+      ? searchMovies(query, page, language, includeAdult)
+      : fetchMovies("popular", page, language);
+  }, [isSearching, query, page, language, includeAdult]);
 
   const { data: movies, isLoading, error } = useCustomFetch<Movie[]>(
-    () => fetchMovies("popular", page),
-    [page]
+    getMovies,
+    [getMovies]
   );
 
-  if (isLoading) return <Loading />;
-  if (error) return <ErrorFallback error={error} />;
+  
+  const moviesToRender = useMemo(() => movies ?? [], [movies]); //렌더 시마다 새 배열만들기 방지
 
+
+
+  const handleSearch = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      const trimmed = searchTerm.trim();
+
+      if (!trimmed) {
+        setIsSearching(false);
+        setQuery("");
+      } else {
+        setIsSearching(true);
+        setQuery(trimmed);
+      }
+
+      setIncludeAdult(formIncludeAdult);
+      setLanguage(formLanguage);
+      setPage(1);
+    },
+    [searchTerm, formIncludeAdult, formLanguage]
+  );
+
+  const handleReset = useCallback(() => {
+    setSearchTerm("");
+    setFormIncludeAdult(false);
+    setFormLanguage("ko-KR");
+
+    setQuery("");
+    setIncludeAdult(false);
+    setLanguage("ko-KR");
+    setIsSearching(false);
+    setPage(1);
+  }, []);
+
+  const handlePrevPage = useCallback(() => {
+    setPage((p) => Math.max(p - 1, 1));
+  }, []);
+
+  const handleNextPage = useCallback(() => {
+    setPage((p) => p + 1);
+  }, []);
+
+  const handleSelectMovie = useCallback((movie: Movie) => {
+    setSelectedMovie(movie);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setSelectedMovie(null);
+  }, []);
 
   return (
-    <div>
-      <div className="flex justify-center gap-4 my-8">
-        <button
-          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          disabled={page === 1}
-          className={`px-4 py-2 rounded ${
-            page === 1
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-purple-300 text-white hover:bg-purple-400"
-          }`}
-        >
-          &lt;
-        </button>
+    <div className="px-10 py-6">
+      {/* 검색 폼 */}
+      <MovieSearchForm
+        searchTerm={searchTerm}
+        formIncludeAdult={formIncludeAdult}
+        formLanguage={formLanguage}
+        isSearching={isSearching}
+        onChangeSearchTerm={setSearchTerm}
+        onChangeIncludeAdult={setFormIncludeAdult}
+        onChangeLanguage={setFormLanguage}
+        onSubmit={handleSearch}
+        onReset={handleReset}
+      />
 
-        <span className="px-4 py-2">{page} 페이지</span>
+      {/* 로딩 / 에러 */}
+      {isLoading && <Loading />}
+      {error && <ErrorFallback error={error} />}
 
-        <button
-          onClick={() => setPage((prev) => prev + 1)}
-          className="px-4 py-2 rounded bg-purple-300 text-white hover:bg-purple-400"
-        >
-          &gt;
-        </button>
-      </div>
+      {/* 페이지네이션 */}
+      <Pagination page={page} onPrev={handlePrevPage} onNext={handleNextPage} />
 
-      <ul className="grid grid-cols-5 gap-4 mx-20 my-12">
-        {movies?.map((movie) => (
-          <li key={movie.id} className="relative group">
-            <Link to={`/movies/${movie.id}`}>
-              <img
-                src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-                className="rounded-md transition duration-300 group-hover:blur-sm"
-                alt={movie.title}
-              />
-              <div
-                className="absolute inset-0 flex flex-col justify-center items-center text-center 
-                            opacity-0 group-hover:opacity-100 transition duration-300 
-                            bg-black/60 rounded-md p-2"
-              >
-                <h3 className="text-white text-sm font-bold mb-2">{movie.title}</h3>
-                <p className="text-gray-200 text-xs line-clamp-5">{movie.overview}</p>
-              </div>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      {/* 영화 리스트 */}
+      {moviesToRender.length > 0 && (
+        <MovieGrid movies={moviesToRender} onSelect={handleSelectMovie} />
+      )}
+
+      {/* 모달 */}
+      {selectedMovie && (
+        <MovieModal movie={selectedMovie} onClose={handleCloseModal} />
+      )}
     </div>
   );
 };
